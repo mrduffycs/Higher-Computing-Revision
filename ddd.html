@@ -169,6 +169,9 @@ input.gap { padding: 3px 6px; font-family: var(--font-mono); margin: 0 2px; }
 .stdin { font: 14px/1.4 var(--font-mono); width: min(360px, 100%); }
 .console { background: #0b1220; color: #d8f3e8; font: 14px/1.5 var(--font-mono); padding: 12px 14px; border-radius: 10px; white-space: pre-wrap; margin: 12px 0 0; max-height: 320px; overflow: auto; }
 .console.err { color: #ffd0c8; }
+.stdin-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.stdin-row[hidden] { display: none; }
+.stdin-in { flex: 1; min-width: 0; font: 14px/1.4 var(--font-mono); padding: 8px 10px; border-radius: 8px; border: 2px solid var(--accent, #2563a8); background: transparent; color: inherit; }
 .higher-note { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--warn) 14%, var(--bg)); border: 1px solid var(--warn); font-size: 15px; }
 .higher-note ul { margin: 6px 0 0; padding-left: 20px; }
 .model { margin-top: 12px; }
@@ -361,6 +364,7 @@ const CHAPTERS = [
   blocks: [
     { type: "text", html: `<h3>Entity-relationship diagrams</h3><p>An ER diagram shows each <b>entity</b> (table) with its <b>attributes</b>, the <b>relationships</b> between entities with a name, and their <b>cardinality</b>: one-to-one, one-to-many or many-to-many.</p>` },
     { type: "figure", html: ERD },
+    { type: "text", html: `<h3>Working out cardinality</h3><p>Ask the question in both directions. One instructor can lead <b>many</b> activities; each activity is led by <b>one</b> instructor: that is <b>one-to-many</b> (Instructor to Activity). The foreign key always goes on the <b>many</b> side. A many-to-many relationship, such as customers and activities, cannot be implemented directly: a link entity (Booking) turns it into two one-to-many relationships.</p>` },
     { type: "match", id: "2a", q: "What is the cardinality of each relationship?", options: ["One-to-one", "One-to-many", "Many-to-many"], items: [["An instructor teaches activities; each activity has one instructor", 1], ["A customer makes bookings; each booking is for one customer", 1], ["A pupil studies many subjects; a subject has many pupils", 2], ["A country has one capital city; a capital city is in one country", 0]] },
     { type: "text", html: `<h3>Keys</h3><ul><li>A <b>primary key</b> uniquely identifies each record, such as <span class="mono">customerID</span>.</li><li>A <b>foreign key</b> is a field that is the primary key of another table, used to link the two, such as <span class="mono">customerID</span> in Booking.</li><li>A <b>compound key</b> is a primary key made from two or more fields that are themselves keys of other tables. Without bookingID, a booking could be identified by <span class="mono">customerID</span> + <span class="mono">activityCode</span> + <span class="mono">bookingDate</span> together.</li></ul>` },
     { type: "match", id: "2b", q: "In the Booking table, what kind of field is each?", options: ["Primary key", "Foreign key", "Neither"], items: [["bookingID", 0], ["customerID", 1], ["activityCode", 1], ["people", 2]] },
@@ -446,6 +450,9 @@ AND bookingDate = "2026-06-12";</pre><p>Forgetting the matching condition pairs 
   blocks: [
     { type: "text", html: `<h3>Aggregate functions and aliases</h3><pre class="code">SELECT MIN(price) AS lowest, MAX(price) AS highest, AVG(price) AS average
 FROM Activity;</pre><p>COUNT counts rows; SUM adds; AVG averages. <b>AS</b> gives a column a clearer name, an <b>alias</b>.</p>` },
+    { type: "text", html: `<table class="tbl"><tr><th>Function</th><th>Returns</th></tr><tr><td>COUNT(*)</td><td>the number of rows</td></tr><tr><td>SUM(field)</td><td>the total of a number field</td></tr><tr><td>AVG(field)</td><td>the average of a number field</td></tr><tr><td>MIN(field), MAX(field)</td><td>the smallest and largest value</td></tr></table><p>A WHERE condition is applied first, so the function only uses the rows that match:</p><pre class="code">SELECT COUNT(*) AS perthCustomers
+FROM Customer
+WHERE town = "Perth";</pre>` },
     { type: "sql", id: "7a", q: "How many bookings have not been paid? Name the column <span class='mono'>unpaidBookings</span>.", starter: "", model: "SELECT COUNT(*) AS unpaidBookings\nFROM Booking\nWHERE paid = 0;", names: true },
     { type: "sql", id: "7b", q: "Show the lowest, highest and average price of an activity, with the aliases <span class='mono'>lowest</span>, <span class='mono'>highest</span> and <span class='mono'>average</span>.", starter: "", model: "SELECT MIN(price) AS lowest, MAX(price) AS highest, AVG(price) AS average\nFROM Activity;", names: true },
     { type: "text", html: `<h3>Computed values</h3><p>A calculation can be a column. Give it an alias:</p><pre class="code">SELECT activityName, price * 1.2 AS priceWithVAT FROM Activity;</pre>` },
@@ -454,6 +461,11 @@ FROM Activity;</pre><p>COUNT counts rows; SUM adds; AVG averages. <b>AS</b> give
 FROM Booking
 GROUP BY activityCode;</pre>` },
     { type: "sql", id: "7d", q: "Show each activityCode and the total number of people booked on it, as <span class='mono'>totalPeople</span>.", starter: "", model: "SELECT activityCode, SUM(people) AS totalPeople\nFROM Booking\nGROUP BY activityCode;", names: true, mustUse: [[/group\s+by/i, "Use GROUP BY activityCode."]] },
+    { type: "text", html: `<h3>Putting it together</h3><p>The clauses always come in this order: SELECT, FROM, WHERE, GROUP BY, ORDER BY. You can sort by an alias.</p><pre class="code">SELECT activityName, SUM(people) AS totalPeople
+FROM Booking, Activity
+WHERE Booking.activityCode = Activity.activityCode
+GROUP BY activityName
+ORDER BY totalPeople DESC;</pre>` },
     { type: "sql", id: "7e", q: "Show each town and the number of bookings from it as <span class='mono'>numberOfBookings</span>, most bookings first, and towns with the same number in A–Z order.", starter: "", model: "SELECT town, COUNT(*) AS numberOfBookings\nFROM Customer, Booking\nWHERE Customer.customerID = Booking.customerID\nGROUP BY town\nORDER BY numberOfBookings DESC, town ASC;", ordered: true, names: true },
   ],
   exam: [ { type: "written", id: "7x", q: "Explain the purpose of GROUP BY activityCode in the query in Try it 7.4.", marks: 1, points: ["It makes one row for each activity code, so SUM(people) is calculated separately for each activity"] } ],
@@ -485,6 +497,7 @@ DELETE FROM Booking WHERE bookingID = 11;</pre><p>Always include a WHERE in UPDA
     { type: "text", html: `<h3>Testing SQL</h3><p>Work out the <b>expected</b> result by hand from the data, run the query, and compare it with the <b>actual</b> result: the right rows, the right fields, correct calculations, correct sort order. Test UPDATE and DELETE by checking the table afterwards.</p><h3>Evaluation</h3><ul><li><b>Fitness for purpose:</b> every functional requirement is met by a query that works.</li><li><b>Accuracy of output:</b> the results are correct and complete: no missing or extra rows, correct totals.</li></ul>` },
     { type: "num", id: "9a", q: "Work out the expected result by hand: how many people in total are booked on Kayaking (KAY)?", answer: 17, hint: "Bookings 1, 5, 10 and 14." },
     { type: "num", id: "9b", q: "Expected result: what is the cost of booking 9 (people × price)?", answer: 300 },
+    { type: "text", html: `<h3>Reading SQL you didn't write</h3><p>Check the clauses one at a time: which tables are in FROM, whether every pair of tables is linked in WHERE, which rows the other conditions keep, and how the results are grouped and sorted. Two tables with no linking condition is the most common cause of too many rows.</p>` },
     { type: "sql", id: "9c", q: "This query should list Perth customers' bookings, but it returns too many rows. Fix it.", starter: "SELECT surname, activityCode, bookingDate\nFROM Customer, Booking\nWHERE town = \"Perth\";", model: "SELECT surname, activityCode, bookingDate\nFROM Customer, Booking\nWHERE Customer.customerID = Booking.customerID\nAND town = \"Perth\";" },
     { type: "choice", id: "9d", q: "A query totals bookings but leaves out unpaid ones that should be included. Which criterion does this affect most?", options: ["Accuracy of output", "Usability"], correct: 0 },
   ],
@@ -598,10 +611,10 @@ const R = {
       <div class="q">${b.q}</div>
       ${files.length ? `<details class="files"><summary>Files this program can open: ${files.map((f) => `<span class="mono">${f}</span>`).join(", ")}</summary>${files.map((f) => `<p class="small mono">${f}</p><pre class="code">${esc(b.files[f])}</pre>`).join("")}</details>` : ""}
       <textarea class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(26, Math.max(8, src.split("\n").length + 1))}" aria-label="Your Python code">${esc(src)}</textarea>
-      <label class="stdin-label small">Keyboard input for Run, one value per line <textarea class="stdin" rows="2" spellcheck="false" aria-label="Keyboard input for Run">${esc(t.stdin ?? b.runInputs ?? "")}</textarea></label>
       <div class="actions"><button class="ghost run-btn" type="button">Run</button><button class="primary code-check" type="button">Check</button><button class="ghost reset-code" type="button">Reset code</button><button class="ghost model-btn" type="button" ${t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show model answer</button></div>
       <div class="higher-note" hidden></div>
       <pre class="console" hidden></pre>
+      <div class="stdin-row" hidden><span class="small">Keyboard input:</span><input class="stdin-in" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type keyboard input for your program"><button class="primary stdin-send" type="button">Enter</button></div>
       <div class="feedback" aria-live="polite">${t.s === "correct" ? "All tests passed." : ""}</div>
       <div class="model" hidden><p class="small"><b>Model answer.</b> Compare it with yours, then try writing it again without looking.</p><pre class="code">${esc(b.model)}</pre></div>
     </section>`;
@@ -778,20 +791,35 @@ function showGen(node) {
 }
 
 // ---------- Python in a background worker ----------
-const PY_INDEX = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
-const HARNESS = "def __run(src, inputs, check, files):\n    import io, contextlib, traceback\n    for name in files:\n        with open(name, \"w\") as handle:\n            handle.write(files[name])\n    queue = list(inputs)\n    buf = io.StringIO()\n\n    def fake_input(prompt=\"\"):\n        buf.write(str(prompt))\n        if not queue:\n            raise EOFError(\"the program asked for more keyboard input than was given\")\n        value = queue.pop(0)\n        buf.write(value + \"\\n\")\n        return value\n\n    def set_inputs(values):\n        queue[:] = list(values)\n\n    def inputs_left():\n        return len(queue)\n\n    def where(err):\n        line = None\n        for frame in traceback.extract_tb(err.__traceback__):\n            if frame.filename == \"your_program.py\":\n                line = frame.lineno\n        return line\n\n    ns = {\"__name__\": \"__main__\", \"input\": fake_input}\n    status, message = \"ok\", \"\"\n    try:\n        code = compile(src, \"your_program.py\", \"exec\")\n        with contextlib.redirect_stdout(buf):\n            exec(code, ns)\n    except SyntaxError as err:\n        status, message = \"syntax\", \"Syntax error on line \" + str(err.lineno) + \": \" + str(err.msg)\n    except BaseException as err:\n        line = where(err)\n        status = \"execution\"\n        message = \"Execution error\" + (\" on line \" + str(line) if line else \"\") + \": \" + type(err).__name__ + \": \" + str(err)\n    output = buf.getvalue()\n    if status == \"ok\" and check:\n        env = {\"ns\": ns, \"output\": output, \"source\": src, \"set_inputs\": set_inputs, \"inputs_left\": inputs_left}\n        quiet = io.StringIO()\n        try:\n            with contextlib.redirect_stdout(quiet):\n                exec(check, env)\n        except AssertionError as err:\n            status, message = \"fail\", str(err)\n        except BaseException as err:\n            line = where(err)\n            status = \"execution\"\n            message = \"Your code raised \" + type(err).__name__ + \": \" + str(err) + (\" (line \" + str(line) + \")\" if line else \"\")\n    return {\"status\": status, \"output\": output, \"message\": message}\n";
+const PY_CDN = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+let LIB_BASE = "";
+try { const u = new URL(".", document.baseURI); if (/^https?:$/.test(u.protocol)) LIB_BASE = u.href; } catch (e) {}
+const PY_LOCAL = LIB_BASE ? LIB_BASE + "pyodide/" : "";
+const HARNESS = "class __NeedInput(BaseException):\n    pass\n\n\ndef __run(src, inputs, check, files, live=False, seed=0):\n    import io, contextlib, traceback, random\n    if seed:\n        random.seed(seed)\n    for name in files:\n        with open(name, \"w\") as handle:\n            handle.write(files[name])\n    queue = list(inputs)\n    buf = io.StringIO()\n\n    def fake_input(prompt=\"\"):\n        buf.write(str(prompt))\n        if not queue and live:\n            raise __NeedInput()\n        if not queue:\n            raise EOFError(\"the program asked for more keyboard input than was given\")\n        value = queue.pop(0)\n        buf.write(value + \"\\n\")\n        return value\n\n    def set_inputs(values):\n        queue[:] = list(values)\n\n    def inputs_left():\n        return len(queue)\n\n    def where(err):\n        line = None\n        for frame in traceback.extract_tb(err.__traceback__):\n            if frame.filename == \"your_program.py\":\n                line = frame.lineno\n        return line\n\n    ns = {\"__name__\": \"__main__\", \"input\": fake_input}\n    status, message = \"ok\", \"\"\n    try:\n        code = compile(src, \"your_program.py\", \"exec\")\n        with contextlib.redirect_stdout(buf):\n            exec(code, ns)\n    except SyntaxError as err:\n        status, message = \"syntax\", \"Syntax error on line \" + str(err.lineno) + \": \" + str(err.msg)\n    except __NeedInput:\n        status = \"input\"\n    except BaseException as err:\n        line = where(err)\n        status = \"execution\"\n        message = \"Execution error\" + (\" on line \" + str(line) if line else \"\") + \": \" + type(err).__name__ + \": \" + str(err)\n    output = buf.getvalue()\n    if status == \"ok\" and check:\n        env = {\"ns\": ns, \"output\": output, \"source\": src, \"set_inputs\": set_inputs, \"inputs_left\": inputs_left}\n        quiet = io.StringIO()\n        try:\n            with contextlib.redirect_stdout(quiet):\n                exec(check, env)\n        except AssertionError as err:\n            status, message = \"fail\", str(err)\n        except BaseException as err:\n            line = where(err)\n            status = \"execution\"\n            message = \"Your code raised \" + type(err).__name__ + \": \" + str(err) + (\" (line \" + str(line) + \")\" if line else \"\")\n    return {\"status\": status, \"output\": output, \"message\": message}\n";
 let pyWorker = null, pyReady = null, pyReq = 0;
 const pyPending = {};
 function startPython() {
-  const src = `importScripts(${JSON.stringify(PY_INDEX + "pyodide.js")});
+  const src = `const bases = ${JSON.stringify([PY_LOCAL, PY_CDN].filter(Boolean))};
 let py;
-const ready = loadPyodide({ indexURL: ${JSON.stringify(PY_INDEX)} }).then((p) => { py = p; py.runPython(${JSON.stringify(HARNESS)}); postMessage({ type: "ready" }); }).catch((e) => postMessage({ type: "loadfail", error: String(e) }));
+async function boot() {
+  let lastErr;
+  for (const base of bases) {
+    try {
+      if (typeof loadPyodide === "undefined") importScripts(base + "pyodide.js");
+      const opts = { indexURL: base };
+      if (base.indexOf("cdn.jsdelivr.net") < 0) opts.stdLibURL = base + "python_stdlib.bin";
+      return await loadPyodide(opts);
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr;
+}
+const ready = boot().then((p) => { py = p; py.runPython(${JSON.stringify(HARNESS)}); postMessage({ type: "ready" }); }).catch((e) => postMessage({ type: "loadfail", error: String(e) }));
 onmessage = async (e) => {
   const d = e.data;
   try {
     await ready;
     py.globals.set("__args", py.toPy(d));
-    const r = py.runPython("__run(__args['src'], __args['inputs'], __args['check'], __args['files'])");
+    const r = py.runPython("__run(__args['src'], __args['inputs'], __args['check'], __args['files'], __args['live'], __args['seed'])");
     const out = r.toJs({ dict_converter: Object.fromEntries });
     r.destroy();
     postMessage(Object.assign({ type: "result", id: d.id }, out));
@@ -811,7 +839,7 @@ onmessage = async (e) => {
   });
   pyReady.catch(() => { if (pyWorker) pyWorker.terminate(); pyWorker = null; });
 }
-async function runPython(src, inputs, check, files) {
+async function runPython(src, inputs, check, files, live, seed) {
   if (!pyWorker) startPython();
   await pyReady;
   return new Promise((resolve) => {
@@ -823,7 +851,7 @@ async function runPython(src, inputs, check, files) {
       resolve({ status: "timeout", output: "", message: "Your program ran for more than 5 seconds, so it was stopped. Look for a loop that never ends." });
     }, 5000);
     pyPending[id] = { resolve, timer };
-    pyWorker.postMessage({ id, src, inputs, check, files });
+    pyWorker.postMessage({ id, src, inputs, check, files, live: !!live, seed: seed || 0 });
   });
 }
 
@@ -855,11 +883,22 @@ async function codeRun(b, node, mode) {
   higherNote(node, src);
   fb.textContent = pyWorker ? (mode === "run" ? "Running…" : "Testing…") : "Loading Python. The first time takes about 10 seconds…";
   try {
-    if (mode === "run") {
-      const inputs = node.querySelector(".stdin").value.split("\n").filter((l, i, a) => l !== "" || i < a.length - 1);
-      const r = await runPython(src, inputs, "", b.files || {});
+    if (mode === "run" || mode === "input") {
+      const row = node.querySelector(".stdin-row"), box = node.querySelector(".stdin-in");
+      if (mode === "run") { node._inputs = []; node._seed = Math.floor(Math.random() * 1e9) + 1; }
+      else { node._inputs.push(box.value); box.value = ""; }
+      row.hidden = true;
+      const r = await runPython(src, node._inputs, "", b.files || {}, true, node._seed);
+      if (r.status === "input") {
+        showConsole(node, r.output, false);
+        row.hidden = false;
+        fb.textContent = "Your program is waiting for keyboard input. Type it in the box and press Enter.";
+        btns.forEach((x) => (x.disabled = false));
+        box.focus();
+        return;
+      }
       showConsole(node, r.output + (r.message ? (r.output ? "\n" : "") + r.message : ""), r.status !== "ok");
-      fb.textContent = r.status === "ok" ? "Program finished. Press Check to test it." : r.status === "timeout" ? r.message : "Your program stopped with an error: read the last line of the output.";
+      fb.textContent = r.status === "ok" ? (r.output.trim() ? "Program finished. Press Check to test it." : "Program finished with nothing displayed. Does it call your function and print the result? Press Check to test it.") : r.status === "timeout" ? r.message : "Your program stopped with an error: read the last line of the output.";
     } else {
       const t = T(b.id);
       t.v = src; t.att++;
@@ -935,17 +974,20 @@ async function webCheck(b, node) {
 }
 
 // ---------- SQL tasks: an in-page SQLite database ----------
-const SQL_BASE = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/";
+const SQL_BASES = [LIB_BASE ? LIB_BASE + "sqljs/" : "", "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/"].filter(Boolean);
 let sqlReady = null;
-function loadSql() {
-  if (sqlReady) return sqlReady;
-  sqlReady = new Promise((resolve, reject) => {
+function loadSqlFrom(base) {
+  return new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = SQL_BASE + "sql-wasm.js";
-    s.onload = () => window.initSqlJs({ locateFile: (f) => SQL_BASE + f }).then(resolve, reject);
+    s.src = base + "sql-wasm.js";
+    s.onload = () => window.initSqlJs({ locateFile: (f) => base + f }).then(resolve, reject);
     s.onerror = () => reject(new Error("sql.js failed to load"));
     document.head.appendChild(s);
   });
+}
+function loadSql() {
+  if (sqlReady) return sqlReady;
+  sqlReady = SQL_BASES.reduce((p, base) => p.catch(() => loadSqlFrom(base)), Promise.reject());
   sqlReady.catch(() => { sqlReady = null; });
   return sqlReady;
 }
@@ -1123,6 +1165,7 @@ function bindChapter(ch) {
     if (b.type === "code" || b.type === "web" || b.type === "sql") {
       const run = b.type === "code" ? (m) => codeRun(b, node, m) : b.type === "sql" ? (m) => sqlTask(b, node, m) : (m) => (m === "run" ? renderPreview(node, node.querySelector(".editor").value) : webCheck(b, node));
       if (e.target.closest(".run-btn")) run("run");
+      else if (e.target.closest(".stdin-send")) run("input");
       else if (e.target.closest(".code-check")) Promise.resolve(run("check")).then(() => refreshProgress(ch));
       else if (e.target.closest(".reset-code")) { node.querySelector(".editor").value = b.starter || ""; t.v = b.starter || ""; save(); if (b.type === "web") renderPreview(node, t.v); }
       else if (e.target.closest(".model-btn")) { node.querySelector(".model").hidden = false; if (t.s !== "correct") { t.s = "shown"; node.classList.add("is-shown"); } save(); refreshProgress(ch); }
@@ -1166,10 +1209,11 @@ function bindChapter(ch) {
     const ta = e.target.closest("textarea");
     if (!ta) return;
     const t = T(ta.closest(".task").dataset.id);
-    if (ta.classList.contains("stdin")) t.stdin = ta.value; else t.v = ta.value;
+    t.v = ta.value;
     save();
   };
   m.onkeydown = (e) => {
+    if (e.key === "Enter" && e.target.classList && e.target.classList.contains("stdin-in")) { e.preventDefault(); e.target.parentNode.querySelector(".stdin-send").click(); return; }
     const ed = e.target.closest("textarea.editor");
     if (ed && e.key === "Escape") { ed.dataset.leave = "1"; return; }
     if (ed && e.key === "Tab" && ed.dataset.leave === "1") { delete ed.dataset.leave; return; }

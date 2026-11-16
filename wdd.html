@@ -169,6 +169,9 @@ input.gap { padding: 3px 6px; font-family: var(--font-mono); margin: 0 2px; }
 .stdin { font: 14px/1.4 var(--font-mono); width: min(360px, 100%); }
 .console { background: #120e1f; color: #d8f3e8; font: 14px/1.5 var(--font-mono); padding: 12px 14px; border-radius: 10px; white-space: pre-wrap; margin: 12px 0 0; max-height: 320px; overflow: auto; }
 .console.err { color: #ffd0c8; }
+.stdin-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.stdin-row[hidden] { display: none; }
+.stdin-in { flex: 1; min-width: 0; font: 14px/1.4 var(--font-mono); padding: 8px 10px; border-radius: 8px; border: 2px solid var(--accent, #6a4bb5); background: transparent; color: inherit; }
 .higher-note { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--warn) 14%, var(--bg)); border: 1px solid var(--warn); font-size: 15px; }
 .higher-note ul { margin: 6px 0 0; padding-left: 20px; }
 .model { margin-top: 12px; }
@@ -367,6 +370,26 @@ Level 3:   Kayaking   Climbing   Mountain biking   (under Activities)</pre>` },
   recall: [ { type: "num", id: "3r1", q: "Recall: what is the most pages allowed on one level of a Higher site structure?", answer: 4 } ],
   blocks: [
     { type: "text", html: `<h3>Structural elements</h3><table class="tbl"><tr><th>Element</th><th>Purpose</th></tr><tr><td>header</td><td>Banner at the top: site name or logo</td></tr><tr><td>nav</td><td>The navigation bar: a list of links</td></tr><tr><td>main</td><td>Content unique to this page</td></tr><tr><td>section</td><td>A themed group of content within main</td></tr><tr><td>footer</td><td>Bottom of the page: contact details</td></tr></table><p>An <b>id</b> names one element; a <b>class</b> names a group that share a style.</p>` },
+    { type: "text", html: `<h3>A page skeleton</h3><pre class="code">&lt;body&gt;
+  &lt;header&gt;
+    &lt;h1&gt;Site name&lt;/h1&gt;
+  &lt;/header&gt;
+  &lt;nav&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href="index.html"&gt;Home&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="visit.html"&gt;Visit&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+  &lt;main&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Opening times&lt;/h2&gt;
+      &lt;p&gt;Open every day.&lt;/p&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+  &lt;footer&gt;
+    &lt;p&gt;Phone 01234 567890&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/body&gt;</pre><p>In each task, <b>Update preview</b> shows your page under the editor and <b>Check</b> tests it.</p>` },
     { type: "web", id: "3a", q: "Complete the page: add a <span class='mono'>header</span> with an h1, a <span class='mono'>nav</span> holding an unordered list of four links (Home, Activities, Accommodation, Booking), a <span class='mono'>main</span> with at least two <span class='mono'>section</span> elements, and a <span class='mono'>footer</span>.",
       starter: PAGE_HEAD + `
 </head>
@@ -390,6 +413,9 @@ Level 3:   Kayaking   Climbing   Mountain biking   (under Activities)</pre>` },
         (d) => (d.querySelector("footer") ? null : "Add a footer at the bottom of the page."),
         (d) => (d.querySelector("header + nav, header ~ nav") && d.querySelector("main ~ footer") ? null : "Put the elements in order: header, nav, main, footer."),
       ] },
+    { type: "text", html: `<h3>Using id and class</h3><pre class="code">&lt;img id="logo" src="images/logo.png" alt="Centre logo"&gt;
+&lt;section class="news"&gt; ... &lt;/section&gt;
+&lt;section class="news"&gt; ... &lt;/section&gt;</pre><p>CSS and JavaScript use these names to find the elements: <span class="mono">#logo</span> for the id, <span class="mono">.news</span> for the class.</p>` },
     { type: "web", id: "3b", q: "Give the main image the id <span class='mono'>hero</span>, and give each of the three activity sections the class <span class='mono'>activity</span>. Every image needs alt text.",
       starter: PAGE_HEAD + `
 </head>
@@ -555,6 +581,8 @@ header, footer { ... }    /* grouping: both */
         (d, w) => (css(w, d.querySelector("nav a"), "text-decoration-line") === "none" ? null : "Remove the underline from the links with text-decoration: none."),
         (d) => (hoverRules(d).some((r) => /nav/.test(r.selectorText) && /background/.test(r.style.cssText)) ? null : "Add a nav a:hover rule that changes the background colour."),
       ] },
+    { type: "text", html: `<h3>Columns with float</h3><pre class="code">.column { float: left; width: 45%; margin-right: 5%; }
+footer  { clear: both; }</pre><p>The widths, margins and padding of the floated elements must add up to no more than 100% of the page, or the last one drops to a new line.</p>` },
     { type: "web", id: "5b", lang: "CSS", q: "Lay out the three activity sections as columns with <span class='mono'>float: left</span> (try width 28% and margin-right 3%, with no padding), and make sure the footer sits below them with <span class='mono'>clear</span>.",
       starter: PAGE_HEAD + `
     <style>
@@ -615,6 +643,24 @@ header, footer { ... }    /* grouping: both */
     { type: "text", html: `<h3>Form elements</h3><table class="tbl"><tr><th>Element</th><th>Code</th></tr><tr><td>Text box</td><td>&lt;input type="text"&gt;</td></tr><tr><td>Number</td><td>&lt;input type="number"&gt;</td></tr><tr><td>Radio buttons</td><td>&lt;input type="radio"&gt; with the same name</td></tr><tr><td>Text area</td><td>&lt;textarea&gt;&lt;/textarea&gt;</td></tr><tr><td>Drop-down list</td><td>&lt;select&gt; with &lt;option&gt;</td></tr><tr><td>Submit</td><td>&lt;input type="submit"&gt;</td></tr></table>
       <h3>Validation</h3><ul><li><b>Presence:</b> <span class="mono">required</span></li><li><b>Length:</b> <span class="mono">maxlength</span>, <span class="mono">minlength</span></li><li><b>Range:</b> <span class="mono">min</span> and <span class="mono">max</span> on a number input</li></ul>` },
     { type: "match", id: "6a", q: "Which form element suits each?", options: ["Text box", "Number", "Radio buttons", "Drop-down list", "Text area"], items: [["A postcode", 0], ["Comments about a stay", 4], ["One of 30 council areas", 3], ["A rating from three choices shown together", 2], ["Number of people", 1]] },
+    { type: "text", html: `<h3>A worked example</h3><pre class="code">&lt;form&gt;
+  &lt;label for="town"&gt;Town&lt;/label&gt;
+  &lt;input type="text" id="town" name="town" required maxlength="25"&gt;
+
+  &lt;label for="tickets"&gt;Tickets&lt;/label&gt;
+  &lt;input type="number" id="tickets" name="tickets" min="1" max="6" required&gt;
+
+  &lt;select name="day"&gt;
+    &lt;option&gt;Saturday&lt;/option&gt;
+    &lt;option&gt;Sunday&lt;/option&gt;
+  &lt;/select&gt;
+
+  &lt;input type="radio" name="seat" value="stalls"&gt; Stalls
+  &lt;input type="radio" name="seat" value="circle"&gt; Circle
+
+  &lt;textarea name="notes" maxlength="200"&gt;&lt;/textarea&gt;
+  &lt;input type="submit" value="Send"&gt;
+&lt;/form&gt;</pre><p>Radio buttons only work as one group (choose one) when they share the same <span class="mono">name</span>. Each input needs a <span class="mono">name</span> so its value can be sent with the form.</p>` },
     { type: "web", id: "6b", q: "Build the booking form: a name text box (required, at most 40 characters); a number of people box (1 to 12, required); a drop-down list of the three activities; experience radio buttons (Beginner, Some, Expert) in one group; a message text area of at most 300 characters; and a submit button. Give each input a label.",
       starter: PAGE_HEAD + `
 </head>
@@ -733,6 +779,17 @@ header, footer { ... }    /* grouping: both */
         (d, w, h) => { const i = d.getElementById("hero"); i.dispatchEvent(new w.MouseEvent("mouseover")); return i.getAttribute("src") === h.img("loch-sunset") ? null : "When the mouse moves over the image, its src should become images/loch-sunset.jpg."; },
         (d, w, h) => { const i = d.getElementById("hero"); i.dispatchEvent(new w.MouseEvent("mouseout")); return i.getAttribute("src") === h.img("loch-day") ? null : "When the mouse leaves, the src should go back to images/loch-day.jpg."; },
       ] },
+    { type: "text", html: `<h3>Changing style and using onclick</h3><p>A function can change any CSS property through <span class="mono">.style</span>. Property names lose the hyphen and gain a capital: <span class="mono">background-color</span> becomes <span class="mono">backgroundColor</span>. <span class="mono">onclick</span> runs a function when the element is clicked.</p><pre class="code">&lt;script&gt;
+function showMap() {
+  document.getElementById("map").style.display = "block";
+}
+function warm() {
+  document.getElementById("panel").style.backgroundColor = "orange";
+}
+&lt;/script&gt;
+
+&lt;button onclick="showMap()"&gt;Show map&lt;/button&gt;
+&lt;div id="panel" onmouseover="warm()"&gt;...&lt;/div&gt;</pre><p>To switch something on and off with one button, use <span class="mono">if</span> to test the current value, then set the other one.</p>` },
     { type: "web", id: "7b", lang: "JavaScript", q: "Write <span class='mono'>toggleTimes()</span> so that each click of the button shows the hidden paragraph (display block), then hides it again (display none).",
       starter: PAGE_HEAD + `
     <style>
@@ -826,6 +883,7 @@ header, footer { ... }    /* grouping: both */
   blocks: [
     { type: "text", html: `<h3>Usability testing</h3><ul><li>A <b>persona</b> is a made-up but realistic description of a typical user.</li><li>A <b>scenario</b> is a short story of a task that persona wants to complete, and why.</li><li>A <b>test case</b> is a specific step-by-step task with an expected outcome.</li></ul><p>These are carried out on the low-fidelity prototype, before coding.</p>` },
     { type: "match", id: "8a", q: "Persona, scenario or test case?", options: ["Persona", "Scenario", "Test case"], items: [["Fiona, 42, primary teacher, browses on her phone, dislikes long forms", 0], ["Fiona has ten minutes at lunch to check climbing for beginners and send an enquiry", 1], ["From the home page, reach the Climbing page in two clicks", 2]] },
+    { type: "text", html: `<h3>Testing validation</h3><ul><li><b>Normal</b> data is well inside the allowed range and should be accepted.</li><li><b>Extreme</b> data is on the boundary of the range and should be accepted.</li><li><b>Exceptional</b> data is outside the range, or the wrong type, and should be rejected.</li></ul>` },
     { type: "match", id: "8b", q: "The number of people must be from 1 to 12. Classify each test value.", options: ["Normal", "Extreme", "Exceptional"], items: [["6", 0], ["1", 1], ["12", 1], ["0", 2], ["13", 2]] },
     { type: "text", html: `<h3>Functional and compatibility testing</h3><ul><li><b>Navigation:</b> every link opens the correct page.</li><li><b>Media:</b> every image, video and audio file displays or plays.</li><li><b>Validation:</b> normal, extreme and exceptional data.</li><li><b>Compatibility:</b> different devices (desktop, tablet, smartphone) and browsers.</li></ul>` },
     { type: "choice", id: "8c", q: "Why must a site with image swaps be tested on a phone?", options: ["Phones can't show images", "Touch screens have no mouse-over, so the swap may not work", "Phones block JavaScript"], correct: 1 },
@@ -1048,10 +1106,10 @@ const R = {
       <div class="q">${b.q}</div>
       ${files.length ? `<details class="files"><summary>Files this program can open: ${files.map((f) => `<span class="mono">${f}</span>`).join(", ")}</summary>${files.map((f) => `<p class="small mono">${f}</p><pre class="code">${esc(b.files[f])}</pre>`).join("")}</details>` : ""}
       <textarea class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(26, Math.max(8, src.split("\n").length + 1))}" aria-label="Your Python code">${esc(src)}</textarea>
-      <label class="stdin-label small">Keyboard input for Run, one value per line <textarea class="stdin" rows="2" spellcheck="false" aria-label="Keyboard input for Run">${esc(t.stdin ?? b.runInputs ?? "")}</textarea></label>
       <div class="actions"><button class="ghost run-btn" type="button">Run</button><button class="primary code-check" type="button">Check</button><button class="ghost reset-code" type="button">Reset code</button><button class="ghost model-btn" type="button" ${t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show model answer</button></div>
       <div class="higher-note" hidden></div>
       <pre class="console" hidden></pre>
+      <div class="stdin-row" hidden><span class="small">Keyboard input:</span><input class="stdin-in" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type keyboard input for your program"><button class="primary stdin-send" type="button">Enter</button></div>
       <div class="feedback" aria-live="polite">${t.s === "correct" ? "All tests passed." : ""}</div>
       <div class="model" hidden><p class="small"><b>Model answer.</b> Compare it with yours, then try writing it again without looking.</p><pre class="code">${esc(b.model)}</pre></div>
     </section>`;
@@ -1228,20 +1286,35 @@ function showGen(node) {
 }
 
 // ---------- Python in a background worker ----------
-const PY_INDEX = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
-const HARNESS = "def __run(src, inputs, check, files):\n    import io, contextlib, traceback\n    for name in files:\n        with open(name, \"w\") as handle:\n            handle.write(files[name])\n    queue = list(inputs)\n    buf = io.StringIO()\n\n    def fake_input(prompt=\"\"):\n        buf.write(str(prompt))\n        if not queue:\n            raise EOFError(\"the program asked for more keyboard input than was given\")\n        value = queue.pop(0)\n        buf.write(value + \"\\n\")\n        return value\n\n    def set_inputs(values):\n        queue[:] = list(values)\n\n    def inputs_left():\n        return len(queue)\n\n    def where(err):\n        line = None\n        for frame in traceback.extract_tb(err.__traceback__):\n            if frame.filename == \"your_program.py\":\n                line = frame.lineno\n        return line\n\n    ns = {\"__name__\": \"__main__\", \"input\": fake_input}\n    status, message = \"ok\", \"\"\n    try:\n        code = compile(src, \"your_program.py\", \"exec\")\n        with contextlib.redirect_stdout(buf):\n            exec(code, ns)\n    except SyntaxError as err:\n        status, message = \"syntax\", \"Syntax error on line \" + str(err.lineno) + \": \" + str(err.msg)\n    except BaseException as err:\n        line = where(err)\n        status = \"execution\"\n        message = \"Execution error\" + (\" on line \" + str(line) if line else \"\") + \": \" + type(err).__name__ + \": \" + str(err)\n    output = buf.getvalue()\n    if status == \"ok\" and check:\n        env = {\"ns\": ns, \"output\": output, \"source\": src, \"set_inputs\": set_inputs, \"inputs_left\": inputs_left}\n        quiet = io.StringIO()\n        try:\n            with contextlib.redirect_stdout(quiet):\n                exec(check, env)\n        except AssertionError as err:\n            status, message = \"fail\", str(err)\n        except BaseException as err:\n            line = where(err)\n            status = \"execution\"\n            message = \"Your code raised \" + type(err).__name__ + \": \" + str(err) + (\" (line \" + str(line) + \")\" if line else \"\")\n    return {\"status\": status, \"output\": output, \"message\": message}\n";
+const PY_CDN = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+let LIB_BASE = "";
+try { const u = new URL(".", document.baseURI); if (/^https?:$/.test(u.protocol)) LIB_BASE = u.href; } catch (e) {}
+const PY_LOCAL = LIB_BASE ? LIB_BASE + "pyodide/" : "";
+const HARNESS = "class __NeedInput(BaseException):\n    pass\n\n\ndef __run(src, inputs, check, files, live=False, seed=0):\n    import io, contextlib, traceback, random\n    if seed:\n        random.seed(seed)\n    for name in files:\n        with open(name, \"w\") as handle:\n            handle.write(files[name])\n    queue = list(inputs)\n    buf = io.StringIO()\n\n    def fake_input(prompt=\"\"):\n        buf.write(str(prompt))\n        if not queue and live:\n            raise __NeedInput()\n        if not queue:\n            raise EOFError(\"the program asked for more keyboard input than was given\")\n        value = queue.pop(0)\n        buf.write(value + \"\\n\")\n        return value\n\n    def set_inputs(values):\n        queue[:] = list(values)\n\n    def inputs_left():\n        return len(queue)\n\n    def where(err):\n        line = None\n        for frame in traceback.extract_tb(err.__traceback__):\n            if frame.filename == \"your_program.py\":\n                line = frame.lineno\n        return line\n\n    ns = {\"__name__\": \"__main__\", \"input\": fake_input}\n    status, message = \"ok\", \"\"\n    try:\n        code = compile(src, \"your_program.py\", \"exec\")\n        with contextlib.redirect_stdout(buf):\n            exec(code, ns)\n    except SyntaxError as err:\n        status, message = \"syntax\", \"Syntax error on line \" + str(err.lineno) + \": \" + str(err.msg)\n    except __NeedInput:\n        status = \"input\"\n    except BaseException as err:\n        line = where(err)\n        status = \"execution\"\n        message = \"Execution error\" + (\" on line \" + str(line) if line else \"\") + \": \" + type(err).__name__ + \": \" + str(err)\n    output = buf.getvalue()\n    if status == \"ok\" and check:\n        env = {\"ns\": ns, \"output\": output, \"source\": src, \"set_inputs\": set_inputs, \"inputs_left\": inputs_left}\n        quiet = io.StringIO()\n        try:\n            with contextlib.redirect_stdout(quiet):\n                exec(check, env)\n        except AssertionError as err:\n            status, message = \"fail\", str(err)\n        except BaseException as err:\n            line = where(err)\n            status = \"execution\"\n            message = \"Your code raised \" + type(err).__name__ + \": \" + str(err) + (\" (line \" + str(line) + \")\" if line else \"\")\n    return {\"status\": status, \"output\": output, \"message\": message}\n";
 let pyWorker = null, pyReady = null, pyReq = 0;
 const pyPending = {};
 function startPython() {
-  const src = `importScripts(${JSON.stringify(PY_INDEX + "pyodide.js")});
+  const src = `const bases = ${JSON.stringify([PY_LOCAL, PY_CDN].filter(Boolean))};
 let py;
-const ready = loadPyodide({ indexURL: ${JSON.stringify(PY_INDEX)} }).then((p) => { py = p; py.runPython(${JSON.stringify(HARNESS)}); postMessage({ type: "ready" }); }).catch((e) => postMessage({ type: "loadfail", error: String(e) }));
+async function boot() {
+  let lastErr;
+  for (const base of bases) {
+    try {
+      if (typeof loadPyodide === "undefined") importScripts(base + "pyodide.js");
+      const opts = { indexURL: base };
+      if (base.indexOf("cdn.jsdelivr.net") < 0) opts.stdLibURL = base + "python_stdlib.bin";
+      return await loadPyodide(opts);
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr;
+}
+const ready = boot().then((p) => { py = p; py.runPython(${JSON.stringify(HARNESS)}); postMessage({ type: "ready" }); }).catch((e) => postMessage({ type: "loadfail", error: String(e) }));
 onmessage = async (e) => {
   const d = e.data;
   try {
     await ready;
     py.globals.set("__args", py.toPy(d));
-    const r = py.runPython("__run(__args['src'], __args['inputs'], __args['check'], __args['files'])");
+    const r = py.runPython("__run(__args['src'], __args['inputs'], __args['check'], __args['files'], __args['live'], __args['seed'])");
     const out = r.toJs({ dict_converter: Object.fromEntries });
     r.destroy();
     postMessage(Object.assign({ type: "result", id: d.id }, out));
@@ -1261,7 +1334,7 @@ onmessage = async (e) => {
   });
   pyReady.catch(() => { if (pyWorker) pyWorker.terminate(); pyWorker = null; });
 }
-async function runPython(src, inputs, check, files) {
+async function runPython(src, inputs, check, files, live, seed) {
   if (!pyWorker) startPython();
   await pyReady;
   return new Promise((resolve) => {
@@ -1273,7 +1346,7 @@ async function runPython(src, inputs, check, files) {
       resolve({ status: "timeout", output: "", message: "Your program ran for more than 5 seconds, so it was stopped. Look for a loop that never ends." });
     }, 5000);
     pyPending[id] = { resolve, timer };
-    pyWorker.postMessage({ id, src, inputs, check, files });
+    pyWorker.postMessage({ id, src, inputs, check, files, live: !!live, seed: seed || 0 });
   });
 }
 
@@ -1305,11 +1378,22 @@ async function codeRun(b, node, mode) {
   higherNote(node, src);
   fb.textContent = pyWorker ? (mode === "run" ? "Running…" : "Testing…") : "Loading Python. The first time takes about 10 seconds…";
   try {
-    if (mode === "run") {
-      const inputs = node.querySelector(".stdin").value.split("\n").filter((l, i, a) => l !== "" || i < a.length - 1);
-      const r = await runPython(src, inputs, "", b.files || {});
+    if (mode === "run" || mode === "input") {
+      const row = node.querySelector(".stdin-row"), box = node.querySelector(".stdin-in");
+      if (mode === "run") { node._inputs = []; node._seed = Math.floor(Math.random() * 1e9) + 1; }
+      else { node._inputs.push(box.value); box.value = ""; }
+      row.hidden = true;
+      const r = await runPython(src, node._inputs, "", b.files || {}, true, node._seed);
+      if (r.status === "input") {
+        showConsole(node, r.output, false);
+        row.hidden = false;
+        fb.textContent = "Your program is waiting for keyboard input. Type it in the box and press Enter.";
+        btns.forEach((x) => (x.disabled = false));
+        box.focus();
+        return;
+      }
       showConsole(node, r.output + (r.message ? (r.output ? "\n" : "") + r.message : ""), r.status !== "ok");
-      fb.textContent = r.status === "ok" ? "Program finished. Press Check to test it." : r.status === "timeout" ? r.message : "Your program stopped with an error: read the last line of the output.";
+      fb.textContent = r.status === "ok" ? (r.output.trim() ? "Program finished. Press Check to test it." : "Program finished with nothing displayed. Does it call your function and print the result? Press Check to test it.") : r.status === "timeout" ? r.message : "Your program stopped with an error: read the last line of the output.";
     } else {
       const t = T(b.id);
       t.v = src; t.att++;
@@ -1385,17 +1469,20 @@ async function webCheck(b, node) {
 }
 
 // ---------- SQL tasks: an in-page SQLite database ----------
-const SQL_BASE = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/";
+const SQL_BASES = [LIB_BASE ? LIB_BASE + "sqljs/" : "", "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/"].filter(Boolean);
 let sqlReady = null;
-function loadSql() {
-  if (sqlReady) return sqlReady;
-  sqlReady = new Promise((resolve, reject) => {
+function loadSqlFrom(base) {
+  return new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = SQL_BASE + "sql-wasm.js";
-    s.onload = () => window.initSqlJs({ locateFile: (f) => SQL_BASE + f }).then(resolve, reject);
+    s.src = base + "sql-wasm.js";
+    s.onload = () => window.initSqlJs({ locateFile: (f) => base + f }).then(resolve, reject);
     s.onerror = () => reject(new Error("sql.js failed to load"));
     document.head.appendChild(s);
   });
+}
+function loadSql() {
+  if (sqlReady) return sqlReady;
+  sqlReady = SQL_BASES.reduce((p, base) => p.catch(() => loadSqlFrom(base)), Promise.reject());
   sqlReady.catch(() => { sqlReady = null; });
   return sqlReady;
 }
@@ -1573,6 +1660,7 @@ function bindChapter(ch) {
     if (b.type === "code" || b.type === "web" || b.type === "sql") {
       const run = b.type === "code" ? (m) => codeRun(b, node, m) : b.type === "sql" ? (m) => sqlTask(b, node, m) : (m) => (m === "run" ? renderPreview(node, node.querySelector(".editor").value) : webCheck(b, node));
       if (e.target.closest(".run-btn")) run("run");
+      else if (e.target.closest(".stdin-send")) run("input");
       else if (e.target.closest(".code-check")) Promise.resolve(run("check")).then(() => refreshProgress(ch));
       else if (e.target.closest(".reset-code")) { node.querySelector(".editor").value = b.starter || ""; t.v = b.starter || ""; save(); if (b.type === "web") renderPreview(node, t.v); }
       else if (e.target.closest(".model-btn")) { node.querySelector(".model").hidden = false; if (t.s !== "correct") { t.s = "shown"; node.classList.add("is-shown"); } save(); refreshProgress(ch); }
@@ -1616,10 +1704,11 @@ function bindChapter(ch) {
     const ta = e.target.closest("textarea");
     if (!ta) return;
     const t = T(ta.closest(".task").dataset.id);
-    if (ta.classList.contains("stdin")) t.stdin = ta.value; else t.v = ta.value;
+    t.v = ta.value;
     save();
   };
   m.onkeydown = (e) => {
+    if (e.key === "Enter" && e.target.classList && e.target.classList.contains("stdin-in")) { e.preventDefault(); e.target.parentNode.querySelector(".stdin-send").click(); return; }
     const ed = e.target.closest("textarea.editor");
     if (ed && e.key === "Escape") { ed.dataset.leave = "1"; return; }
     if (ed && e.key === "Tab" && ed.dataset.leave === "1") { delete ed.dataset.leave; return; }

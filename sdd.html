@@ -169,6 +169,9 @@ input.gap { padding: 3px 6px; font-family: var(--font-mono); margin: 0 2px; }
 .stdin { font: 14px/1.4 var(--font-mono); width: min(360px, 100%); }
 .console { background: #0b1a1f; color: #d8f3e8; font: 14px/1.5 var(--font-mono); padding: 12px 14px; border-radius: 10px; white-space: pre-wrap; margin: 12px 0 0; max-height: 320px; overflow: auto; }
 .console.err { color: #ffd0c8; }
+.stdin-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.stdin-row[hidden] { display: none; }
+.stdin-in { flex: 1; min-width: 0; font: 14px/1.4 var(--font-mono); padding: 8px 10px; border-radius: 8px; border: 2px solid var(--accent, #0f7c8c); background: transparent; color: inherit; }
 .higher-note { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--warn) 14%, var(--bg)); border: 1px solid var(--warn); font-size: 15px; }
 .higher-note ul { margin: 6px 0 0; padding-left: 20px; }
 .model { margin-top: 12px; }
@@ -286,7 +289,7 @@ function seededShuffle(arr, seedText) {
 if (false) module.exports = { toTwos, fromTwos, fpEncode, fpDecode, sameNumber, sameText, seededShuffle };
 
 const BOOK = { key: "sdd-higher-workbook-v1", tag: "sdd-workbook", file: "sdd", short: "Software Design and Development",
-  howto: ["<b>Code tasks</b>: write Python in the page. <b>Run</b> shows what your program does; <b>Check</b> tests it. Python takes a few seconds to load the first time.", "<b>Higher check</b>: if you use Python that isn't in the Higher course, such as <span class='mono'>break</span> or <span class='mono'>max()</span>, you'll see a note suggesting the Higher way."] };
+  howto: ["<b>Code tasks</b>: write Python in the page. <b>Run</b> shows what your program does; <b>Check</b> tests it. Python takes a few seconds to load the first time.", "<b>Keyboard input</b>: when your program reaches <span class='mono'>input()</span>, a box appears under the output. Type the value and press Enter, just as you would in IDLE.", "<b>Higher check</b>: if you use Python that isn't in the Higher course, such as <span class='mono'>break</span> or <span class='mono'>max()</span>, you'll see a note suggesting the Higher way."] };
 // ---------- Software Design and Development workbook content ----------
 const RESULTS_CSV = `Aileen Ross,V40,Y,2875
 Ben Clark,Senior,N,3120
@@ -389,7 +392,7 @@ const CHAPTERS = [
 },
 {
   id: "design", num: 3, title: "Design",
-  intentions: ["I can read and write structure diagrams and data flow", "I can write pseudocode with stepwise refinement", "I can use flowchart symbols and wireframes"],
+  intentions: ["I can read and write structure diagrams and data flow", "I can write pseudocode with stepwise refinement", "I can design a user interface with a wireframe"],
   recall: [
     { type: "match", id: "3r1", q: "Recall: purpose, scope or boundary?", options: ["Purpose", "Scope", "Boundary"], items: [["The program will not edit the results file", 2], ["Deliverables include a test plan", 1]] },
   ],
@@ -406,8 +409,18 @@ const CHAPTERS = [
    2.6 END FOR
    2.7 RETURN position</pre>` },
     { type: "order", id: "3b", q: "Put the refinement of step 6 (count club members) in order.", mono: true, items: ["SET count TO 0", "FOR index FROM 0 TO length(runners) - 1 DO", "    IF runners[index].member = true THEN", "        SET count TO count + 1", "    END IF", "END FOR"] },
-    { type: "text", html: `<h3>Flowcharts and wireframes</h3><p>Flowcharts use four symbols. A <b>wireframe</b> sketches the screen: where each input and output appears, with labels and messages.</p>` },
-    { type: "match", id: "3c", q: "Match each flowchart symbol to its use.", options: ["Start and end", "A calculation or assignment", "Data entered or displayed", "A condition with true and false exits"], items: [["Rounded rectangle (terminator)", 0], ["Rectangle (process)", 1], ["Parallelogram (input/output)", 2], ["Diamond (decision)", 3]] },
+    { type: "text", html: `<h3>Wireframes</h3><p>At Higher, program logic is designed with <b>structure diagrams</b> and <b>pseudocode</b>. The <b>user interface</b> is designed with a <b>wireframe</b>: a sketch of what the user sees, showing every <b>input</b> (with its prompt) and every <b>output</b> (with its position and wording).</p><pre class="code">+------------------------------------------+
+|  Strathmore Running Club                 |
+|                                          |
+|  Fastest: [name]  [time] seconds         |   output
+|  Club members: [count]                   |   output
+|                                          |
+|  Runner to find: [__________]            |   input, with prompt
+|  [name] finished in [time] seconds       |   output
+|  or: [name] was not found                |   output (error message)
++------------------------------------------+</pre>` },
+    { type: "multi", id: "3c", q: "Select everything the wireframe above shows.", options: ["The prompt shown for each input", "Where each output appears", "The pseudocode for the search", "The message shown when a runner is not found", "The data types of the variables"], correct: [0, 1, 3] },
+    { type: "match", id: "3d", q: "Which design technique would you use for each job?", options: ["Structure diagram", "Pseudocode", "Wireframe"], items: [["Break the problem into sub-problems", 0], ["Refine one step into detailed, numbered lines", 1], ["Plan the prompts and messages the user will see", 2], ["Show the order of the main sub-programs at a glance", 0]] },
   ],
   exam: [
     { type: "written", id: "3x", q: "State what is meant by data flow and explain why it is shown in a design.", marks: 2, points: ["The data passed into and out of each sub-program", "It shows which parameters each sub-program needs, so they can be implemented correctly"] },
@@ -417,7 +430,7 @@ const CHAPTERS = [
   id: "records", num: 4, title: "Data types, arrays and records",
   intentions: ["I can choose a suitable data type", "I can declare and use records with data classes", "I can create arrays of records and parallel arrays"],
   recall: [
-    { type: "choice", id: "4r1", q: "Recall: which flowchart symbol shows a decision?", options: ["Rectangle", "Diamond", "Parallelogram"], correct: 1 },
+    { type: "choice", id: "4r1", q: "Recall: which design technique plans the prompts and messages the user will see?", options: ["Structure diagram", "Wireframe", "Pseudocode"], correct: 1 },
   ],
   blocks: [
     { type: "text", html: `<h3>Simple data types</h3><table class="tbl"><tr><th>Type</th><th>Python</th><th>Example</th></tr><tr><td>String</td><td>str</td><td>"Aileen Ross"</td></tr><tr><td>Character</td><td>str of length 1</td><td>"Y"</td></tr><tr><td>Integer</td><td>int</td><td>2875</td></tr><tr><td>Real</td><td>float</td><td>4.99</td></tr><tr><td>Boolean</td><td>bool</td><td>True</td></tr></table>` },
@@ -500,6 +513,9 @@ assert len(t) == 4, "make_runners(4) should return 4 records."
 assert all(isinstance(r, ns["Runner"]) for r in t), "Every element should be a Runner record."
 t[0].name = "X"
 assert t[1].name == "", "Changing one record changed another: create a new Runner() each time round the loop."` }] },
+    { type: "text", html: `<h3>Parallel arrays</h3><p>The same data can be held in <b>parallel 1-D arrays</b>: one array per field, where the same index refers to the same runner.</p><pre class="code">names = [""] * 20
+times = [0] * 20
+# names[4] and times[4] both belong to runner 4</pre><p>Parallel arrays work, but every array must be kept in step and passed to each sub-program. An array of records keeps each runner's fields together in one structure.</p>` },
     { type: "choice", id: "4e", q: "Which is an advantage of an array of records over parallel arrays?", options: ["It uses less memory", "Each item's fields stay together, so they can't get out of step", "It can only hold integers"], correct: 1 },
   ],
   exam: [
@@ -508,7 +524,7 @@ assert t[1].name == "", "Changing one record changed another: create a new Runne
 },
 {
   id: "subprograms", num: 5, title: "Sub-programs, parameters and scope",
-  intentions: ["I can write procedures and functions", "I can identify formal and actual parameters", "I can explain passing by value and by reference", "I can explain local and global scope"],
+  intentions: ["I can write procedures and functions", "I can identify formal and actual parameters", "I can explain local and global scope"],
   recall: [
     { type: "match", id: "5r1", q: "Recall: choose the data type.", options: ["String", "Integer", "Real", "Boolean"], items: [["4.99", 2], ["True", 3], ["\"V40\"", 0]] },
   ],
@@ -542,9 +558,9 @@ assert g is not None, "There is no get_grade function."
 for m, e in [(70, "A"), (100, "A"), (69, "B"), (60, "B"), (59, "C"), (50, "C"), (49, "F"), (0, "F")]:
     got = g(m)
     assert got == e, f"get_grade({m}) returned {got!r} but should return {e!r}. Check the boundary values."` }] },
-    { type: "text", html: `<h3>By value and by reference</h3><p>In Python, simple values (integer, real, string, Boolean) behave as <b>by value</b>: changes inside the sub-program don't affect the original. Arrays and records behave as <b>by reference</b>: changes to their contents change the original. To send back a changed simple value, <span class="mono">return</span> it.</p>` },
-    { type: "gap", id: "5c", q: "Predict the output.<pre class='code'>def double(number, values):\n    number = number * 2\n    values[0] = values[0] * 2\n\nn = 5\nv = [5, 6]\ndouble(n, v)\nprint(n, v)</pre>", text: "Output: {{5 [10, 6]}}", hint: "The integer is passed by value; the array by reference." },
-    { type: "code", id: "5d", q: "Write a function <span class='mono'>format_time(seconds)</span> that returns a string such as <span class='mono'>\"47 min 55 s\"</span> for 2875. Use <span class='mono'>int()</span> and <span class='mono'>%</span>.",
+    { type: "text", html: `<h3>Changing parameters in Python</h3><p>A practical point for your own programs: if a sub-program changes a simple parameter (integer, real, string, Boolean), the original variable is <b>not</b> changed. If it changes the <b>contents</b> of an array or record, the original <b>is</b> changed. To send back a changed simple value, <span class="mono">return</span> it.</p>` },
+    { type: "gap", id: "5c", q: "Predict the output.<pre class='code'>def double(number, values):\n    number = number * 2\n    values[0] = values[0] * 2\n\nn = 5\nv = [5, 6]\ndouble(n, v)\nprint(n, v)</pre>", text: "Output: {{5 [10, 6]}}", hint: "The integer in the main program is not changed; the contents of the array are." },
+    { type: "code", id: "5d", q: "Write a function <span class='mono'>format_time(seconds)</span> that returns a string such as <span class='mono'>\"47 min 55 s\"</span> for 2875. <span class='mono'>int(7.9)</span> gives 7 (it removes the fraction) and <span class='mono'>2875 % 60</span> gives 55 (the remainder).",
       starter: `def format_time(seconds):
     return ""
 
@@ -564,17 +580,25 @@ assert f is not None, "There is no format_time function."
 for s, e in [(2875, "47 min 55 s"), (3720, "62 min 0 s"), (59, "0 min 59 s")]:
     got = f(s)
     assert got == e, f"format_time({s}) returned {got!r} but should return {e!r}."` }] },
+    { type: "text", html: `<h3>Scope: local and global variables</h3><ul><li>A <b>local variable</b> is created inside a sub-program. It can only be used there, and it is removed when the sub-program ends.</li><li>A <b>global variable</b> is created in the main program and can be used anywhere.</li></ul><p>Good programs use local variables and pass data through parameters. Two sub-programs can then use the same name without clashing, and each one can be tested and reused on its own.</p><pre class="code">def count_members(runners):
+    count = 0              # local: exists only inside count_members
+    for index in range(len(runners)):
+        if runners[index].member:
+            count = count + 1
+    return count
+
+members = count_members(runners)   # members and runners are global</pre>` },
     { type: "choice", id: "5e", q: "Two sub-programs both use a variable called <span class='mono'>index</span> without clashing. Why?", options: ["Each index is a local variable", "index is a global variable", "Python renames one of them"], correct: 0 },
   ],
   exam: [
-    { type: "written", id: "5x", q: "Explain why an array of 10 000 records is normally passed by reference rather than by value.", marks: 1, points: ["By value would copy all 10 000 records, using extra memory and time; by reference passes only the location"] },
+    { type: "written", id: "5x", q: "Explain one benefit of using local variables and parameters instead of global variables.", marks: 2, points: ["A local variable can only be changed inside its own sub-program, so other sub-programs cannot change it by accident", "Sub-programs are self-contained: they can be tested separately, reused, and use the same variable names without clashing"] },
   ],
 },
 {
   id: "predefined", num: 6, title: "Predefined functions",
   intentions: ["I can use substring, character to ASCII and ASCII to character", "I can use real to integer and modulus"],
   recall: [
-    { type: "choice", id: "6r1", q: "Recall: which is passed by reference in Python?", options: ["An integer", "An array", "A string"], correct: 1 },
+    { type: "choice", id: "6r1", q: "Recall: a variable created inside a sub-program is…", options: ["a global variable", "a local variable", "an actual parameter"], correct: 1 },
   ],
   blocks: [
     { type: "text", html: `<table class="tbl"><tr><th>Function</th><th>Python</th><th>Example</th><th>Result</th></tr><tr><td>Substring</td><td>text[start:end]</td><td>"Catriona"[0:3]</td><td>"Cat"</td></tr><tr><td>Character to ASCII</td><td>ord()</td><td>ord("A")</td><td>65</td></tr><tr><td>ASCII to character</td><td>chr()</td><td>chr(66)</td><td>"B"</td></tr><tr><td>Real to integer</td><td>int()</td><td>int(7.9)</td><td>7</td></tr><tr><td>Modulus</td><td>a % b</td><td>2875 % 60</td><td>55</td></tr></table><p>A substring stops <b>before</b> the end index. <span class="mono">int()</span> removes the fraction; it does not round.</p>` },
@@ -763,6 +787,10 @@ while age &lt; 11 or age &gt; 18:
     mark = int(input("Mark (0-100): "))
     # keep asking until the mark is valid
     return mark
+
+
+mark = get_mark()
+print("Accepted:", mark)
 `,
       model: `def get_mark():
     mark = int(input("Mark (0-100): "))
@@ -770,12 +798,16 @@ while age &lt; 11 or age &gt; 18:
         print("Mark must be from 0 to 100.")
         mark = int(input("Mark (0-100): "))
     return mark
+
+
+mark = get_mark()
+print("Accepted:", mark)
 `,
       cases: [
-        { check: `set_inputs(["150", "-1", "50"])
+        { inputs: ["50"], check: `set_inputs(["150", "-1", "50"])
 m = ns["get_mark"]()
 assert m == 50, f"After entering 150, -1 then 50, get_mark() returned {m!r} but should return 50."` },
-        { check: `set_inputs(["0"])
+        { inputs: ["50"], check: `set_inputs(["0"])
 assert ns["get_mark"]() == 0, "0 is valid (extreme data) and should be accepted first time."
 set_inputs(["101", "100"])
 assert ns["get_mark"]() == 100, "101 should be rejected and 100 accepted."` },
@@ -813,9 +845,16 @@ assert f(n, "Cal") == 2, "Cal is at position 2."
 assert f(n, "Bob") == 1, "Return the first match: Bob is first at position 1."
 assert f(n, "Zed") == -1, "A name that isn't there should return -1."
 assert ".index(" not in source, "Write the search yourself rather than using .index()."` }] },
+    { type: "text", html: `<h3>Count occurrences</h3><p>Start a counter at 0, visit every element with a <b>fixed loop</b>, and add 1 each time the condition is met.</p><pre class="code">count = 0
+for index in range(len(runners)):
+    if runners[index].member == True:
+        count = count + 1</pre>` },
     { type: "code", id: "8c", q: "Write <span class='mono'>count_over(values, limit)</span> that returns how many values are <b>greater than</b> <span class='mono'>limit</span>.",
       starter: `def count_over(values, limit):
     return 0
+
+
+print(count_over([5, 10, 15, 20], 10))   # should be 2
 `,
       model: `def count_over(values, limit):
     count = 0
@@ -823,6 +862,9 @@ assert ".index(" not in source, "Write the search yourself rather than using .in
         if values[index] > limit:
             count = count + 1
     return count
+
+
+print(count_over([5, 10, 15, 20], 10))   # should be 2
 `,
       cases: [{ check: `f = ns.get("count_over")
 assert f is not None, "There is no count_over function."
@@ -840,6 +882,9 @@ for index in range(1, len(runners)):
 
 def find_slowest(runners):
     return 0
+
+team = [Runner("Aileen Ross", "V40", True, 2875), Runner("Morag Quinn", "V60", True, 4020), Runner("Graeme Hunter", "Senior", True, 2655)]
+print("Slowest:", team[find_slowest(team)].name)   # should be Morag Quinn
 `,
       model: RUNNER_CLASS + `
 
@@ -849,6 +894,9 @@ def find_slowest(runners):
         if runners[index].seconds > runners[position].seconds:
             position = index
     return position
+
+team = [Runner("Aileen Ross", "V40", True, 2875), Runner("Morag Quinn", "V60", True, 4020), Runner("Graeme Hunter", "Senior", True, 2655)]
+print("Slowest:", team[find_slowest(team)].name)   # should be Morag Quinn
 `,
       cases: [{ check: `R = ns["Runner"]
 f = ns.get("find_slowest")
@@ -876,6 +924,12 @@ assert "max(" not in source, "Write the algorithm yourself rather than using max
     { type: "match", id: "9a", q: "A mark must be from 0 to 100. Classify each test value.", options: ["Normal", "Extreme", "Exceptional"], items: [["55", 0], ["0", 1], ["100", 1], ["101", 2], ["-5", 2]] },
     { type: "text", html: `<h3>Types of error</h3><ul><li><b>Syntax:</b> the code breaks the language's rules, so it can't run (a missing colon).</li><li><b>Execution:</b> the program crashes while running (index out of range, dividing by zero).</li><li><b>Logic:</b> it runs but gives the wrong answer (&gt; instead of &lt;).</li></ul>` },
     { type: "match", id: "9b", q: "Which type of error?", options: ["Syntax", "Execution", "Logic"], items: [["if mark > 50 with no colon", 0], ["IndexError: list index out of range", 1], ["Find minimum returns the largest value", 2], ["print(10 / count) when count is 0", 1]] },
+    { type: "text", html: `<h3>Dry runs and trace tables</h3><p>A <b>dry run</b> is working through code by hand, line by line. A <b>trace table</b> records the result: one column for each variable (or condition) and one row for each pass round the loop. Comparing the table with what you expected shows the line where a logic error happens.</p><pre class="code">def count_members(runners):
+    count = 0
+    for index in range(len(runners)):
+        if runners[index].member == True:
+            count = count + 1
+    return count</pre>` },
     { type: "trace", id: "9c", q: "Trace <span class='mono'>count_members</span> with the member values <span class='mono'>[True, False, True, True]</span>.", cols: ["index", "runners[index].member", "count after"], rows: [["0", "True", "{{1}}"], ["1", "False", "{{1}}"], ["2", "True", "{{2}}"], ["3", "True", "{{3}}"]] },
     { type: "code", id: "9d", q: "This function should count times <b>under</b> the limit, but it has two logic errors. Find and fix them.",
       starter: `def count_under(times, limit):
@@ -902,6 +956,7 @@ print(count_under([2600, 2800, 3100], 3000))   # should be 2
 assert f([2600, 2800, 3100], 3000) == 2, "count_under([2600, 2800, 3100], 3000) should be 2: is the first time being checked?"
 assert f([2600, 3000, 3100], 3000) == 1, "count_under([2600, 3000, 3100], 3000) should be 1: a time equal to the limit is not under it."
 assert f([1, 2], 10) == 2, "Both values are under 10."` }] },
+    { type: "text", html: `<h3>Debugging tools</h3><ul><li>A <b>breakpoint</b> is a marker on a line of code. The program pauses when it reaches that line, so you can inspect the variables.</li><li>A <b>watchpoint</b> is set on a variable. The program pauses when that variable changes, or when a condition on it becomes true (for example, <span class="mono">count &gt; 20</span>).</li></ul>` },
     { type: "match", id: "9e", q: "Match each debugging technique to its description.", options: ["Working through code by hand", "Records each variable's value at every step", "Pauses the program at a chosen line", "Pauses when a variable changes or a condition becomes true"], items: [["Dry run", 0], ["Trace table", 1], ["Breakpoint", 2], ["Watchpoint", 3]] },
   ],
   exam: [
@@ -918,7 +973,7 @@ assert f([1, 2], 10) == 2, "Both values are under 10."` }] },
     { type: "text", html: `<h3>Five criteria</h3><ul><li><b>Fitness for purpose:</b> meets every functional requirement.</li><li><b>Efficient use of constructs:</b> loops and arrays instead of repeated code; elif; conditional loops that stop early.</li><li><b>Usability:</b> clear prompts, helpful error messages, readable output.</li><li><b>Maintainability:</b> meaningful names, comments, indentation, modular sub-programs with parameters.</li><li><b>Robustness:</b> copes with unexpected input without crashing.</li></ul>` },
     { type: "match", id: "10a", q: "Which criterion does each comment evaluate?", options: ["Fitness for purpose", "Efficiency", "Usability", "Maintainability", "Robustness"], items: [["Every test in the plan gave the expected result", 0], ["An array and a loop replace twenty separate variables", 1], ["The error message says exactly which values are allowed", 2], ["Each task is a separate, well-named function", 3], ["Typing a word for the age makes the program crash", 4]] },
     { type: "choice", id: "10b", q: "Why is <span class='mono'>if … elif … else</span> more efficient than three separate <span class='mono'>if</span> statements for a grade?", options: ["It uses fewer variables", "Once one condition is true the rest are not tested", "It runs every condition twice to check"], correct: 1 },
-    { type: "text", html: `<h3>Final challenge: Glenmore Picture House</h3><p><span class="mono">films.csv</span> holds 12 lines: title, certificate, screenings, tickets sold and ticket price. Write a program that:</p><ol><li>reads the file into an array of <span class="mono">Film</span> records;</li><li>displays <span class="mono">Total takings: £</span> and the whole-pound total (tickets × price, added up);</li><li>displays <span class="mono">Most popular:</span> and the title with the most tickets;</li><li>asks for a certificate, accepting only U, PG, 12A, 15 or 18, and displays how many films have it;</li><li>asks for a title and displays its average tickets per screening (whole number), or that it is not showing.</li></ol><p>Use separate functions with parameters. Press Run to try it: type keyboard input in the box, one value per line.</p>` },
+    { type: "text", html: `<h3>Final challenge: Glenmore Picture House</h3><p><span class="mono">films.csv</span> holds 12 lines: title, certificate, screenings, tickets sold and ticket price. Write a program that:</p><ol><li>reads the file into an array of <span class="mono">Film</span> records;</li><li>displays <span class="mono">Total takings: £</span> and the whole-pound total (tickets × price, added up);</li><li>displays <span class="mono">Most popular:</span> and the title with the most tickets;</li><li>asks for a certificate, accepting only U, PG, 12A, 15 or 18, and displays how many films have it;</li><li>asks for a title and displays its average tickets per screening (whole number), or that it is not showing.</li></ol><p>Use separate functions with parameters. Press Run to try it: when your program asks for input, type it in the box under the output and press Enter.</p>` },
     { type: "code", id: "10c", q: "Build the cinema program.", files: { "films.csv": FILMS_CSV }, runInputs: "15\nStarfall",
       starter: `from dataclasses import dataclass
 
@@ -1153,10 +1208,10 @@ const R = {
       <div class="q">${b.q}</div>
       ${files.length ? `<details class="files"><summary>Files this program can open: ${files.map((f) => `<span class="mono">${f}</span>`).join(", ")}</summary>${files.map((f) => `<p class="small mono">${f}</p><pre class="code">${esc(b.files[f])}</pre>`).join("")}</details>` : ""}
       <textarea class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(26, Math.max(8, src.split("\n").length + 1))}" aria-label="Your Python code">${esc(src)}</textarea>
-      <label class="stdin-label small">Keyboard input for Run, one value per line <textarea class="stdin" rows="2" spellcheck="false" aria-label="Keyboard input for Run">${esc(t.stdin ?? b.runInputs ?? "")}</textarea></label>
       <div class="actions"><button class="ghost run-btn" type="button">Run</button><button class="primary code-check" type="button">Check</button><button class="ghost reset-code" type="button">Reset code</button><button class="ghost model-btn" type="button" ${t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show model answer</button></div>
       <div class="higher-note" hidden></div>
       <pre class="console" hidden></pre>
+      <div class="stdin-row" hidden><span class="small">Keyboard input:</span><input class="stdin-in" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type keyboard input for your program"><button class="primary stdin-send" type="button">Enter</button></div>
       <div class="feedback" aria-live="polite">${t.s === "correct" ? "All tests passed." : ""}</div>
       <div class="model" hidden><p class="small"><b>Model answer.</b> Compare it with yours, then try writing it again without looking.</p><pre class="code">${esc(b.model)}</pre></div>
     </section>`;
@@ -1333,20 +1388,35 @@ function showGen(node) {
 }
 
 // ---------- Python in a background worker ----------
-const PY_INDEX = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
-const HARNESS = "def __run(src, inputs, check, files):\n    import io, contextlib, traceback\n    for name in files:\n        with open(name, \"w\") as handle:\n            handle.write(files[name])\n    queue = list(inputs)\n    buf = io.StringIO()\n\n    def fake_input(prompt=\"\"):\n        buf.write(str(prompt))\n        if not queue:\n            raise EOFError(\"the program asked for more keyboard input than was given\")\n        value = queue.pop(0)\n        buf.write(value + \"\\n\")\n        return value\n\n    def set_inputs(values):\n        queue[:] = list(values)\n\n    def inputs_left():\n        return len(queue)\n\n    def where(err):\n        line = None\n        for frame in traceback.extract_tb(err.__traceback__):\n            if frame.filename == \"your_program.py\":\n                line = frame.lineno\n        return line\n\n    ns = {\"__name__\": \"__main__\", \"input\": fake_input}\n    status, message = \"ok\", \"\"\n    try:\n        code = compile(src, \"your_program.py\", \"exec\")\n        with contextlib.redirect_stdout(buf):\n            exec(code, ns)\n    except SyntaxError as err:\n        status, message = \"syntax\", \"Syntax error on line \" + str(err.lineno) + \": \" + str(err.msg)\n    except BaseException as err:\n        line = where(err)\n        status = \"execution\"\n        message = \"Execution error\" + (\" on line \" + str(line) if line else \"\") + \": \" + type(err).__name__ + \": \" + str(err)\n    output = buf.getvalue()\n    if status == \"ok\" and check:\n        env = {\"ns\": ns, \"output\": output, \"source\": src, \"set_inputs\": set_inputs, \"inputs_left\": inputs_left}\n        quiet = io.StringIO()\n        try:\n            with contextlib.redirect_stdout(quiet):\n                exec(check, env)\n        except AssertionError as err:\n            status, message = \"fail\", str(err)\n        except BaseException as err:\n            line = where(err)\n            status = \"execution\"\n            message = \"Your code raised \" + type(err).__name__ + \": \" + str(err) + (\" (line \" + str(line) + \")\" if line else \"\")\n    return {\"status\": status, \"output\": output, \"message\": message}\n";
+const PY_CDN = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+let LIB_BASE = "";
+try { const u = new URL(".", document.baseURI); if (/^https?:$/.test(u.protocol)) LIB_BASE = u.href; } catch (e) {}
+const PY_LOCAL = LIB_BASE ? LIB_BASE + "pyodide/" : "";
+const HARNESS = "class __NeedInput(BaseException):\n    pass\n\n\ndef __run(src, inputs, check, files, live=False, seed=0):\n    import io, contextlib, traceback, random\n    if seed:\n        random.seed(seed)\n    for name in files:\n        with open(name, \"w\") as handle:\n            handle.write(files[name])\n    queue = list(inputs)\n    buf = io.StringIO()\n\n    def fake_input(prompt=\"\"):\n        buf.write(str(prompt))\n        if not queue and live:\n            raise __NeedInput()\n        if not queue:\n            raise EOFError(\"the program asked for more keyboard input than was given\")\n        value = queue.pop(0)\n        buf.write(value + \"\\n\")\n        return value\n\n    def set_inputs(values):\n        queue[:] = list(values)\n\n    def inputs_left():\n        return len(queue)\n\n    def where(err):\n        line = None\n        for frame in traceback.extract_tb(err.__traceback__):\n            if frame.filename == \"your_program.py\":\n                line = frame.lineno\n        return line\n\n    ns = {\"__name__\": \"__main__\", \"input\": fake_input}\n    status, message = \"ok\", \"\"\n    try:\n        code = compile(src, \"your_program.py\", \"exec\")\n        with contextlib.redirect_stdout(buf):\n            exec(code, ns)\n    except SyntaxError as err:\n        status, message = \"syntax\", \"Syntax error on line \" + str(err.lineno) + \": \" + str(err.msg)\n    except __NeedInput:\n        status = \"input\"\n    except BaseException as err:\n        line = where(err)\n        status = \"execution\"\n        message = \"Execution error\" + (\" on line \" + str(line) if line else \"\") + \": \" + type(err).__name__ + \": \" + str(err)\n    output = buf.getvalue()\n    if status == \"ok\" and check:\n        env = {\"ns\": ns, \"output\": output, \"source\": src, \"set_inputs\": set_inputs, \"inputs_left\": inputs_left}\n        quiet = io.StringIO()\n        try:\n            with contextlib.redirect_stdout(quiet):\n                exec(check, env)\n        except AssertionError as err:\n            status, message = \"fail\", str(err)\n        except BaseException as err:\n            line = where(err)\n            status = \"execution\"\n            message = \"Your code raised \" + type(err).__name__ + \": \" + str(err) + (\" (line \" + str(line) + \")\" if line else \"\")\n    return {\"status\": status, \"output\": output, \"message\": message}\n";
 let pyWorker = null, pyReady = null, pyReq = 0;
 const pyPending = {};
 function startPython() {
-  const src = `importScripts(${JSON.stringify(PY_INDEX + "pyodide.js")});
+  const src = `const bases = ${JSON.stringify([PY_LOCAL, PY_CDN].filter(Boolean))};
 let py;
-const ready = loadPyodide({ indexURL: ${JSON.stringify(PY_INDEX)} }).then((p) => { py = p; py.runPython(${JSON.stringify(HARNESS)}); postMessage({ type: "ready" }); }).catch((e) => postMessage({ type: "loadfail", error: String(e) }));
+async function boot() {
+  let lastErr;
+  for (const base of bases) {
+    try {
+      if (typeof loadPyodide === "undefined") importScripts(base + "pyodide.js");
+      const opts = { indexURL: base };
+      if (base.indexOf("cdn.jsdelivr.net") < 0) opts.stdLibURL = base + "python_stdlib.bin";
+      return await loadPyodide(opts);
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr;
+}
+const ready = boot().then((p) => { py = p; py.runPython(${JSON.stringify(HARNESS)}); postMessage({ type: "ready" }); }).catch((e) => postMessage({ type: "loadfail", error: String(e) }));
 onmessage = async (e) => {
   const d = e.data;
   try {
     await ready;
     py.globals.set("__args", py.toPy(d));
-    const r = py.runPython("__run(__args['src'], __args['inputs'], __args['check'], __args['files'])");
+    const r = py.runPython("__run(__args['src'], __args['inputs'], __args['check'], __args['files'], __args['live'], __args['seed'])");
     const out = r.toJs({ dict_converter: Object.fromEntries });
     r.destroy();
     postMessage(Object.assign({ type: "result", id: d.id }, out));
@@ -1366,7 +1436,7 @@ onmessage = async (e) => {
   });
   pyReady.catch(() => { if (pyWorker) pyWorker.terminate(); pyWorker = null; });
 }
-async function runPython(src, inputs, check, files) {
+async function runPython(src, inputs, check, files, live, seed) {
   if (!pyWorker) startPython();
   await pyReady;
   return new Promise((resolve) => {
@@ -1378,7 +1448,7 @@ async function runPython(src, inputs, check, files) {
       resolve({ status: "timeout", output: "", message: "Your program ran for more than 5 seconds, so it was stopped. Look for a loop that never ends." });
     }, 5000);
     pyPending[id] = { resolve, timer };
-    pyWorker.postMessage({ id, src, inputs, check, files });
+    pyWorker.postMessage({ id, src, inputs, check, files, live: !!live, seed: seed || 0 });
   });
 }
 
@@ -1410,11 +1480,22 @@ async function codeRun(b, node, mode) {
   higherNote(node, src);
   fb.textContent = pyWorker ? (mode === "run" ? "Running…" : "Testing…") : "Loading Python. The first time takes about 10 seconds…";
   try {
-    if (mode === "run") {
-      const inputs = node.querySelector(".stdin").value.split("\n").filter((l, i, a) => l !== "" || i < a.length - 1);
-      const r = await runPython(src, inputs, "", b.files || {});
+    if (mode === "run" || mode === "input") {
+      const row = node.querySelector(".stdin-row"), box = node.querySelector(".stdin-in");
+      if (mode === "run") { node._inputs = []; node._seed = Math.floor(Math.random() * 1e9) + 1; }
+      else { node._inputs.push(box.value); box.value = ""; }
+      row.hidden = true;
+      const r = await runPython(src, node._inputs, "", b.files || {}, true, node._seed);
+      if (r.status === "input") {
+        showConsole(node, r.output, false);
+        row.hidden = false;
+        fb.textContent = "Your program is waiting for keyboard input. Type it in the box and press Enter.";
+        btns.forEach((x) => (x.disabled = false));
+        box.focus();
+        return;
+      }
       showConsole(node, r.output + (r.message ? (r.output ? "\n" : "") + r.message : ""), r.status !== "ok");
-      fb.textContent = r.status === "ok" ? "Program finished. Press Check to test it." : r.status === "timeout" ? r.message : "Your program stopped with an error: read the last line of the output.";
+      fb.textContent = r.status === "ok" ? (r.output.trim() ? "Program finished. Press Check to test it." : "Program finished with nothing displayed. Does it call your function and print the result? Press Check to test it.") : r.status === "timeout" ? r.message : "Your program stopped with an error: read the last line of the output.";
     } else {
       const t = T(b.id);
       t.v = src; t.att++;
@@ -1490,17 +1571,20 @@ async function webCheck(b, node) {
 }
 
 // ---------- SQL tasks: an in-page SQLite database ----------
-const SQL_BASE = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/";
+const SQL_BASES = [LIB_BASE ? LIB_BASE + "sqljs/" : "", "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/"].filter(Boolean);
 let sqlReady = null;
-function loadSql() {
-  if (sqlReady) return sqlReady;
-  sqlReady = new Promise((resolve, reject) => {
+function loadSqlFrom(base) {
+  return new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = SQL_BASE + "sql-wasm.js";
-    s.onload = () => window.initSqlJs({ locateFile: (f) => SQL_BASE + f }).then(resolve, reject);
+    s.src = base + "sql-wasm.js";
+    s.onload = () => window.initSqlJs({ locateFile: (f) => base + f }).then(resolve, reject);
     s.onerror = () => reject(new Error("sql.js failed to load"));
     document.head.appendChild(s);
   });
+}
+function loadSql() {
+  if (sqlReady) return sqlReady;
+  sqlReady = SQL_BASES.reduce((p, base) => p.catch(() => loadSqlFrom(base)), Promise.reject());
   sqlReady.catch(() => { sqlReady = null; });
   return sqlReady;
 }
@@ -1678,6 +1762,7 @@ function bindChapter(ch) {
     if (b.type === "code" || b.type === "web" || b.type === "sql") {
       const run = b.type === "code" ? (m) => codeRun(b, node, m) : b.type === "sql" ? (m) => sqlTask(b, node, m) : (m) => (m === "run" ? renderPreview(node, node.querySelector(".editor").value) : webCheck(b, node));
       if (e.target.closest(".run-btn")) run("run");
+      else if (e.target.closest(".stdin-send")) run("input");
       else if (e.target.closest(".code-check")) Promise.resolve(run("check")).then(() => refreshProgress(ch));
       else if (e.target.closest(".reset-code")) { node.querySelector(".editor").value = b.starter || ""; t.v = b.starter || ""; save(); if (b.type === "web") renderPreview(node, t.v); }
       else if (e.target.closest(".model-btn")) { node.querySelector(".model").hidden = false; if (t.s !== "correct") { t.s = "shown"; node.classList.add("is-shown"); } save(); refreshProgress(ch); }
@@ -1721,10 +1806,11 @@ function bindChapter(ch) {
     const ta = e.target.closest("textarea");
     if (!ta) return;
     const t = T(ta.closest(".task").dataset.id);
-    if (ta.classList.contains("stdin")) t.stdin = ta.value; else t.v = ta.value;
+    t.v = ta.value;
     save();
   };
   m.onkeydown = (e) => {
+    if (e.key === "Enter" && e.target.classList && e.target.classList.contains("stdin-in")) { e.preventDefault(); e.target.parentNode.querySelector(".stdin-send").click(); return; }
     const ed = e.target.closest("textarea.editor");
     if (ed && e.key === "Escape") { ed.dataset.leave = "1"; return; }
     if (ed && e.key === "Tab" && ed.dataset.leave === "1") { delete ed.dataset.leave; return; }
