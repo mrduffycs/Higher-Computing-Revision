@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Software Design and Development Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Plan: one study app per Higher unit, each in its textbook's colour; left rail of chapters, one readable column of learn-then-try blocks with in-page Python, web preview or SQL. */
+:root {
+  --bg: #ffffff;
+  --surface: #eef6f7;
+  --surface-2: #dcecef;
+  --ink: #0f2a33;
+  --muted: #4a6670;
+  --line: #cfe0e3;
+  --accent: #0f7c8c;
+  --accent-ink: #ffffff;
+  --info: #2f6fb3;
+  --good: #2e7d4f;
+  --good-bg: #e6f3eb;
+  --bad: #c0392b;
+  --bad-bg: #fbe9e6;
+  --warn: #b7791f;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1a1f; --surface: #12262d; --surface-2: #1a333b; --ink: #e8f3f5; --muted: #9dbac2; --line: #2a464f;
+    --accent: #3cb7c8; --accent-ink: #062027; --info: #7fb2ea; --good: #6fcf97; --good-bg: #1d3326; --bad: #f08a7c; --bad-bg: #3a1f1a; --warn: #e3b25c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b1a1f; --surface: #12262d; --surface-2: #1a333b; --ink: #e8f3f5; --muted: #9dbac2; --line: #2a464f;
+  --accent: #3cb7c8; --accent-ink: #062027; --info: #7fb2ea; --good: #6fcf97; --good-bg: #1d3326; --bad: #f08a7c; --bad-bg: #3a1f1a; --warn: #e3b25c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 17px/1.55 var(--font-body); }
+.layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); min-height: 100vh; }
+aside { background: var(--surface); border-right: 1px solid var(--line); padding: 22px 14px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 19px; line-height: 1.15; padding: 0 10px 16px; }
+.brand small { display: block; font: 700 11px/1.4 var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+#nav { display: flex; flex-direction: column; gap: 2px; }
+#nav a { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; color: var(--ink); text-decoration: none; font-size: 14.5px; line-height: 1.3; }
+#nav a:hover { background: var(--surface-2); }
+#nav a.on { background: var(--accent); color: var(--accent-ink); }
+#nav .num { font: 700 13px var(--font-mono); text-align: center; }
+#nav .mini { font: 500 11.5px var(--font-mono); opacity: .75; }
+#nav a.complete .mini { color: var(--good); opacity: 1; }
+#nav a.on.complete .mini { color: inherit; }
+main { padding: 36px clamp(16px, 4vw, 56px) 80px; max-width: 860px; }
+h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 4vw, 38px); line-height: 1.1; margin: 0 0 14px; text-wrap: balance; }
+h3 { font-family: var(--font-display); font-weight: 600; font-size: 21px; margin: 0 0 8px; text-wrap: balance; }
+.eyebrow { font-weight: 700; font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+.small { font-size: 14px; color: var(--muted); margin: 6px 0 0; }
+.mono, .code, .bit, .pv span { font-family: var(--font-mono); }
+.bar { display: block; height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .3s; }
+.ch-head { margin-bottom: 22px; }
+.intentions, .recall, .exam, .rag, .howto { background: var(--surface); border-radius: 14px; padding: 18px 20px; margin: 22px 0; }
+.intentions ul { margin: 0; padding-left: 20px; }
+.recall { border: 2px dashed var(--line); background: transparent; }
+.exam { background: var(--surface-2); }
+.prose { margin: 26px 0 10px; }
+.prose p { margin: 8px 0; max-width: 68ch; }
+.prose ol, .prose ul { padding-left: 22px; }
+.pv { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+.pv span { min-width: 44px; padding: 6px 4px; text-align: center; background: var(--ink); color: var(--bg); border-radius: 6px; font-weight: 700; font-size: 14px; }
+.pv span.neg { background: var(--accent); color: var(--accent-ink); }
+.pv span.pt { background: transparent; color: var(--ink); min-width: 14px; }
+.code { background: var(--surface); padding: 12px 14px; border-radius: 8px; overflow-x: auto; font-size: 14px; }
+.tbl { border-collapse: collapse; margin: 10px 0; font-size: 15.5px; }
+.tbl th, .tbl td { text-align: left; padding: 7px 14px 7px 0; border-bottom: 1px solid var(--line); }
+.tbl th { color: var(--muted); font-weight: 700; }
+.fig { margin: 22px 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; }
+.fig svg { width: 100%; min-width: 520px; height: auto; display: block; }
+
+.task { border: 1.5px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; background: var(--bg); transition: border-color .2s, background .2s; }
+.task.is-correct { border-color: var(--good); background: var(--good-bg); }
+.task.is-shown { border-color: var(--warn); }
+.task.is-marked { border-color: var(--info); }
+.task-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
+.tag { font: 700 12px var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.gen-tag { color: var(--info); }
+.marks, .streak { font-size: 13px; color: var(--muted); }
+.task.gen { border-style: dashed; border-color: var(--info); }
+.q { margin: 0 0 10px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+button { font: inherit; cursor: pointer; }
+.primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 9px; padding: 8px 18px; font-weight: 700; text-decoration: none; display: inline-block; }
+.primary.big { padding: 12px 22px; font-size: 17px; }
+.primary.danger { background: var(--bad); color: #fff; }
+.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 9px; padding: 7px 14px; }
+.ghost:hover { border-color: var(--muted); }
+.link { background: none; border: 0; padding: 0; color: var(--info); text-decoration: underline; font-size: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--info); outline-offset: 2px; }
+.feedback { margin-top: 10px; font-weight: 700; min-height: 1em; }
+.is-correct .feedback { color: var(--good); }
+.hint { margin-top: 10px; padding: 10px 12px; background: var(--surface); border-radius: 8px; font-size: 15.5px; }
+input[type=text], textarea, select { font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+.answer-row input { width: min(240px, 100%); font-family: var(--font-mono); }
+textarea { width: 100%; resize: vertical; }
+input.gap { padding: 3px 6px; font-family: var(--font-mono); margin: 0 2px; }
+.wrong { border-color: var(--bad) !important; background: var(--bad-bg) !important; }
+.gap-text { line-height: 2.2; margin: 0; }
+.bits { display: inline-block; overflow-x: auto; max-width: 100%; }
+.bitrow { display: flex; gap: 5px; }
+.bitrow.places { margin-bottom: 5px; }
+.bitrow.places span { width: 46px; text-align: center; font: 700 13px var(--font-mono); color: var(--muted); }
+.bit { width: 46px; height: 46px; border: 2px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); font-size: 20px; font-weight: 700; padding: 0; }
+.bit:hover { border-color: var(--accent); }
+.bit.wrong { color: var(--bad); }
+.is-correct .bit { border-color: var(--good); }
+.fp { display: flex; flex-wrap: wrap; gap: 14px; }
+.fp .bit { width: 30px; height: 38px; font-size: 16px; }
+.fp .bitrow { gap: 3px; flex-wrap: wrap; }
+.fp-label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt { background: var(--surface); color: var(--ink); border: 1.5px solid var(--line); border-radius: 9px; padding: 8px 14px; text-align: left; }
+.opt.picked { border-color: var(--accent); background: var(--surface-2); font-weight: 700; }
+.match { display: grid; gap: 8px; }
+.match-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(170px, 300px); gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.match-row select { width: 100%; }
+.points { margin-top: 12px; }
+.point { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; }
+.point input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--accent); }
+.score { font-weight: 700; color: var(--info); }
+.rag-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.rag-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.rag-btn { border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 99px; padding: 5px 12px; font-size: 14px; }
+.rag-btn.r0.on { background: var(--bad); border-color: var(--bad); color: #fff; }
+.rag-btn.r1.on { background: var(--warn); border-color: var(--warn); color: #fff; }
+.rag-btn.r2.on { background: var(--good); border-color: var(--good); color: #fff; }
+.pager { display: flex; justify-content: space-between; gap: 16px; margin-top: 30px; flex-wrap: wrap; }
+.pager a { color: var(--accent); font-weight: 700; text-decoration: none; }
+.hero { padding: 10px 0 8px; }
+.lede { font-size: 19px; max-width: 60ch; color: var(--muted); }
+.hero-stats { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; margin: 18px 0 8px; }
+.hero-stats b { font: 800 40px var(--font-display); display: block; line-height: 1; }
+.hero-stats span { font-size: 14px; color: var(--muted); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 22px 0; }
+.card { display: grid; gap: 8px; padding: 16px; border-radius: 14px; background: var(--surface); color: var(--ink); text-decoration: none; border: 1.5px solid transparent; }
+.card:hover { border-color: var(--accent); }
+.card .num { font: 700 13px var(--font-mono); color: var(--accent); }
+.card .ct { font-weight: 700; line-height: 1.3; min-height: 2.6em; }
+.card.complete .bar span { background: var(--good); }
+.confirm { margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.confirm[hidden] { display: none; }
+.confirm p { margin: 0; font-weight: 700; }
+.savebox { margin: 22px 4px 0; padding: 14px 12px; border-top: 1px solid var(--line); display: grid; gap: 8px; }
+.save-title { margin: 0; font-weight: 700; font-size: 14px; }
+.savebox .ghost, .load-label { font-size: 14px; text-align: center; padding: 7px 10px; background: var(--bg); cursor: pointer; display: block; }
+.save-status { margin: 0; }
+.load-confirm { display: grid; gap: 6px; font-size: 14px; }
+.load-confirm[hidden] { display: none; }
+.load-confirm p { margin: 0; }
+.howto .save-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.editor { width: 100%; font: 14.5px/1.5 var(--font-mono); background: var(--surface); color: var(--ink); border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; tab-size: 4; white-space: pre; overflow-x: auto; resize: vertical; margin-top: 4px; }
+.editor:focus { border-color: var(--accent); }
+.stdin-label { display: grid; gap: 4px; margin-top: 10px; }
+.stdin { font: 14px/1.4 var(--font-mono); width: min(360px, 100%); }
+.console { background: #0b1a1f; color: #d8f3e8; font: 14px/1.5 var(--font-mono); padding: 12px 14px; border-radius: 10px; white-space: pre-wrap; margin: 12px 0 0; max-height: 320px; overflow: auto; }
+.console.err { color: #ffd0c8; }
+.higher-note { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--warn) 14%, var(--bg)); border: 1px solid var(--warn); font-size: 15px; }
+.higher-note ul { margin: 6px 0 0; padding-left: 20px; }
+.model { margin-top: 12px; }
+.files { margin: 6px 0 10px; font-size: 15px; }
+.files summary { cursor: pointer; color: var(--info); }
+.files pre { max-height: 200px; overflow: auto; }
+.mono-line { font-family: var(--font-mono); white-space: pre; font-size: 14.5px; overflow-x: auto; }
+.trace-wrap { overflow-x: auto; }
+.trace td, .trace th { padding: 6px 12px; border: 1px solid var(--line); }
+.prose pre.code, .q pre.code { white-space: pre; }
+button:disabled { opacity: .55; cursor: progress; }
+.back { display: block; font-size: 13.5px; color: var(--muted); text-decoration: none; padding: 0 10px 12px; }
+.back:hover { color: var(--accent); }
+.web-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.preview-wrap .small { margin: 0 0 4px; }
+.preview { width: 100%; height: 360px; border: 1.5px solid var(--line); border-radius: 10px; background: #fff; }
+.sql-out { margin-top: 12px; }
+.result td, .result th { border: 1px solid var(--line); padding: 5px 10px; font-size: 14.5px; }
+.result th { background: var(--surface); }
+.dbview { margin: 16px 0; background: var(--surface); border-radius: 12px; padding: 12px 16px; }
+.dbview summary { cursor: pointer; font-weight: 700; color: var(--accent); }
+.dbview h4 { margin: 14px 0 4px; }
+@media (max-width: 820px) {
+  .savebox { grid-template-columns: 1fr 1fr; margin: 10px 0 0; padding: 10px 0 0; }
+  .save-title, .save-status, .load-confirm { grid-column: 1 / -1; }
+  .layout { grid-template-columns: 1fr; }
+  aside { position: static; height: auto; padding: 12px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .brand { padding-bottom: 8px; }
+  #nav { flex-direction: row; overflow-x: auto; gap: 4px; }
+  #nav a { grid-template-columns: auto; white-space: nowrap; }
+  #nav .nt, #nav .mini { display: none; }
+  .match-row, .rag-row { grid-template-columns: 1fr; }
+  .bit { width: 34px; height: 40px; font-size: 17px; }
+  .bitrow.places span { width: 34px; font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside><a class="back" href="index.html">← All workbooks</a><div class="brand"><small>Higher Computing Science</small>Software Design and Development workbook</div><nav id="nav" aria-label="Chapters"></nav>
+    <div class="savebox" id="savebox">
+      <p class="save-title">My progress file</p>
+      <button type="button" class="ghost save-btn" id="save-btn">Download my progress</button>
+      <label class="ghost load-label" for="load-file">Load my progress</label>
+      <input type="file" id="load-file" accept=".json,application/json" hidden>
+      <p class="save-status small" id="save-status" aria-live="polite"></p>
+      <div class="load-confirm" id="load-confirm" hidden><p id="load-summary"></p><button type="button" class="primary" id="load-yes">Replace my progress</button><button type="button" class="ghost" id="load-no">Cancel</button></div>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+<script>
+// ---------- pure logic (tested in node) ----------
+function toTwos(n, bits) {
+  if (n < 0) n = n + 2 ** bits;
+  let s = "";
+  for (let i = 0; i < bits; i++) { s = (n % 2) + s; n = Math.floor(n / 2); }
+  return s;
+}
+function toBinary(n, bits) { return toTwos(n, bits); }
+function fromTwos(b) {
+  let v = 0;
+  const n = b.length;
+  for (let i = 0; i < n; i++) {
+    let p = 2 ** (n - 1 - i);
+    if (i === 0) p = -p;
+    if (b[i] === "1") v += p;
+  }
+  return v;
+}
+function fpEncode(x, m = 15, e = 8) {
+  const sign = x < 0 ? "1" : "0";
+  x = Math.abs(x);
+  let exp = 0;
+  while (x >= 1) { x /= 2; exp++; }
+  while (x > 0 && x < 0.5) { x *= 2; exp--; }
+  let mant = "";
+  for (let i = 0; i < m; i++) { x *= 2; const d = Math.floor(x); mant += d; x -= d; }
+  return { sign, mantissa: mant, exponent: toTwos(exp, e), exp };
+}
+function fpDecode(sign, mant, expBits) {
+  const e = fromTwos(expBits);
+  let m = 0;
+  for (let i = 0; i < mant.length; i++) if (mant[i] === "1") m += 2 ** -(i + 1);
+  return (sign === "1" ? -1 : 1) * m * 2 ** e;
+}
+function sameNumber(input, answer) {
+  const clean = String(input).replace(/[\s,£]/g, "").replace(/bytes?$/i, "").replace(/−/g, "-");
+  if (clean === "") return false;
+  const v = Number(clean);
+  return !Number.isNaN(v) && Math.abs(v - Number(answer)) < 1e-9;
+}
+function sameText(input, accepted) {
+  const norm = (t) => String(t).toLowerCase().replace(/[^a-z0-9.\-]/g, "");
+  return accepted.some((a) => norm(a) === norm(input));
+}
+function mulberry(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, seedText) {
+  let seed = 0;
+  for (const ch of seedText) seed = (seed * 31 + ch.charCodeAt(0)) | 0;
+  const r = mulberry(seed);
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  if (a.every((v, i) => v === arr[i]) && a.length > 1) a.push(a.shift());
+  return a;
+}
+if (false) module.exports = { toTwos, fromTwos, fpEncode, fpDecode, sameNumber, sameText, seededShuffle };
+
+const BOOK = { key: "sdd-higher-workbook-v1", tag: "sdd-workbook", file: "sdd", short: "Software Design and Development",
+  howto: ["<b>Code tasks</b>: write Python in the page. <b>Run</b> shows what your program does; <b>Check</b> tests it. Python takes a few seconds to load the first time.", "<b>Higher check</b>: if you use Python that isn't in the Higher course, such as <span class='mono'>break</span> or <span class='mono'>max()</span>, you'll see a note suggesting the Higher way."] };
+// ---------- Software Design and Development workbook content ----------
+const RESULTS_CSV = `Aileen Ross,V40,Y,2875
+Ben Clark,Senior,N,3120
+Catriona Bell,Senior,Y,2710
+Dougie Fraser,V50,Y,3405
+Euan Grant,U20,N,2950
+Fiona Kerr,V40,Y,3010
+Graeme Hunter,Senior,Y,2655
+Hannah Lyle,V60,N,3890
+Iain Munro,V50,Y,3260
+Jenna Nisbet,Senior,N,2990
+Kirsty Orr,U20,Y,2840
+Lewis Paton,V40,N,3555
+Morag Quinn,V60,Y,4020
+Niall Reid,Senior,Y,2790
+Olivia Scott,V50,N,3330
+Paul Thomson,Senior,Y,3005
+Rhona Urquhart,V40,Y,2925
+Stuart Vass,U20,N,3150
+Tara Wallace,Senior,Y,2690
+Ewan Young,V60,Y,3720
+`;
+const FILMS_CSV = `The Last Ferry,12A,14,1620,8.50
+Midnight on Arran,15,10,410,8.50
+Paws and Claws,U,18,2210,6.00
+Granite City,15,12,1290,8.50
+The Quiet Loch,PG,8,95,7.00
+Starfall,12A,20,2740,8.50
+Hollow Tide,18,6,330,9.00
+Puffin Island,U,10,880,6.00
+Red Sky,15,8,72,8.50
+The Clockmaker,PG,12,1045,7.00
+Northern Lights,12A,10,640,8.50
+Silent Running,18,4,60,9.00
+`;
+const PUPILS_CSV = `Ava Brown,5C,72
+Ben Hay,5C,48
+Cara Lamb,5D,55
+Dan Moir,5D,39
+Erin Paul,5C,81
+Finn Rae,5D,50
+Gail Shaw,5C,63
+Hugh Tait,5D,44
+`;
+const SCORES_TXT = `7
+12
+3
+9
+15
+4
+8
+11
+6
+10
+`;
+const RUNNER_CLASS = `from dataclasses import dataclass
+
+@dataclass
+class Runner:
+    name: str = ""
+    category: str = ""
+    member: bool = False
+    seconds: int = 0
+`;
+
+const CHAPTERS = [
+{
+  id: "methodologies", num: 1, title: "Development methodologies",
+  intentions: ["I can name the phases of the iterative development process in order", "I can describe agile methodologies", "I can compare iterative and agile development"],
+  recall: [],
+  blocks: [
+    { type: "text", html: `<h3>The iterative development process</h3><p>Software moves through six phases: analysis, design, implementation, testing, documentation and evaluation. It is <b>iterative</b> because any phase can send you back to an earlier one: a logic error found in testing sends you back to implementation, or even design.</p>` },
+    { type: "order", id: "1a", q: "Put the six phases in order.", items: ["Analysis", "Design", "Implementation", "Testing", "Documentation", "Evaluation"] },
+    { type: "text", html: `<h3>Agile methodologies</h3><p>Agile builds software in short cycles called <b>sprints</b>, often one to four weeks. Each sprint produces a small working part that the client sees and comments on.</p><ul><li>The client is involved throughout.</li><li>Requirements are expected to change.</li><li>Small teams talk face to face, often in a daily stand-up.</li><li>Working software matters more than detailed documentation.</li></ul>` },
+    { type: "match", id: "1b", q: "Iterative or agile? Choose for each statement.", options: ["Iterative", "Agile"], items: [["The client mainly sees the program near the end", 0], ["Working parts are delivered after each sprint", 1], ["Changes to requirements are welcomed", 1], ["Detailed documentation is produced at every phase", 0], ["Best when requirements are clear and fixed", 0], ["Small teams meet daily", 1]] },
+    { type: "choice", id: "1c", q: "A client wants a games app but is not sure which features she wants. Which methodology suits best?", options: ["Iterative, because the design is fixed early", "Agile, because she can review each sprint and change her mind", "Neither: she must decide first"], correct: 1 },
+  ],
+  exam: [
+    { type: "written", id: "1x", q: "Explain why agile development would suit the client in Try it 1.3.", marks: 2, points: ["Working parts are delivered in short sprints that the client reviews", "So features can be added or changed as she decides what she wants"] },
+    { type: "written", id: "1y", q: "Describe two differences between iterative and agile development.", marks: 2, points: ["Client involvement: throughout in agile, mainly at the start and end in iterative", "Documentation: light in agile, detailed at every phase in iterative (or: agile delivers working parts each sprint; iterative delivers at the end)"] },
+  ],
+},
+{
+  id: "analysis", num: 2, title: "Analysis",
+  intentions: ["I can identify purpose, scope and boundaries", "I can identify functional requirements as inputs, processes and outputs"],
+  recall: [
+    { type: "choice", id: "2r1", q: "Recall: in which methodology is the client involved throughout?", options: ["Iterative", "Agile"], correct: 1 },
+  ],
+  blocks: [
+    { type: "text", html: `<h3>The running case study</h3><p><b>Strathmore Running Club</b> stores its monthly 10 km race results in a CSV file: name, age category, member (Y/N) and time in seconds. The secretary wants a program that finds the fastest and slowest runners, counts club members, searches for a runner by name, and writes everyone under 50 minutes to a new file.</p>
+      <h3>Purpose, scope and boundaries</h3><ul><li><b>Purpose:</b> a short general statement of what the program is for.</li><li><b>Scope:</b> the deliverables (design, program, test plan, evaluation) and any deadline.</li><li><b>Boundaries:</b> the limits: what it will and won't do, and any assumptions.</li></ul>` },
+    { type: "match", id: "2a", q: "Purpose, scope or boundary?", options: ["Purpose", "Scope", "Boundary"], items: [["The program will analyse the monthly race results file", 0], ["The file is assumed to hold exactly 20 lines", 2], ["Deliverables: design, program, test plan and evaluation", 1], ["The program will not sort runners into order", 2], ["To be completed within four weeks", 1]] },
+    { type: "text", html: `<h3>Functional requirements</h3><p>Functional requirements describe what the program must do, as <b>inputs</b>, <b>processes</b> and <b>outputs</b>. Each must be specific enough to test.</p>` },
+    { type: "match", id: "2b", q: "Input, process or output?", options: ["Input", "Process", "Output"], items: [["Race results read from results.csv", 0], ["Find the minimum time", 1], ["Name and time of the fastest runner", 2], ["Name of runner to search for, from the keyboard", 0], ["Count the club members", 1], ["The file fast.txt", 2]] },
+    { type: "choice", id: "2c", q: "Which of these is a testable functional requirement?", options: ["Make the program easy to use", "Display the number of club members", "Make the program look good"], correct: 1 },
+  ],
+  exam: [
+    { type: "written", id: "2x", q: "A cinema wants a program that reads its weekly ticket sales from a file, calculates total takings, and displays the film with the highest attendance. Identify the inputs, processes and outputs.", marks: 3, points: ["Input: weekly ticket sales read from the file", "Processes: calculate total takings; find the film with the highest attendance", "Outputs: total takings; the name of the most-attended film"] },
+  ],
+},
+{
+  id: "design", num: 3, title: "Design",
+  intentions: ["I can read and write structure diagrams and data flow", "I can write pseudocode with stepwise refinement", "I can use flowchart symbols and wireframes"],
+  recall: [
+    { type: "match", id: "3r1", q: "Recall: purpose, scope or boundary?", options: ["Purpose", "Scope", "Boundary"], items: [["The program will not edit the results file", 2], ["Deliverables include a test plan", 1]] },
+  ],
+  blocks: [
+    { type: "text", html: `<h3>Structure diagrams and data flow</h3><p>A structure diagram breaks the program into sub-problems, read left to right. Each box becomes a sub-program. <b>Data flow</b> shows what each one receives (<b>in</b>) and sends back (<b>out</b>), which become its parameters and return value.</p>
+      <table class="tbl"><tr><th>Sub-program</th><th>In</th><th>Out</th></tr><tr><td>Read results</td><td>filename</td><td>runners</td></tr><tr><td>Find fastest</td><td>runners</td><td>fastest</td></tr><tr><td>Count members</td><td>runners</td><td>members</td></tr><tr><td>Get name</td><td></td><td>target</td></tr><tr><td>Search runner</td><td>runners, target</td><td>found</td></tr></table>` },
+    { type: "gap", id: "3a", q: "Complete the data flow for <i>Write fast file</i>, which writes runners under a time limit to a file and returns nothing.", text: "In: runners, {{filename|file name}}, {{limit}}. Out: {{nothing|none}}" },
+    { type: "text", html: `<h3>Pseudocode and stepwise refinement</h3><p>Write the main steps, then refine each one until it is close to code. Number refinements from their parent step.</p><pre class="code">2. Find the position of the fastest runner
+   2.1 SET position TO 0
+   2.2 FOR index FROM 1 TO length(runners) - 1 DO
+   2.3     IF runners[index].seconds &lt; runners[position].seconds THEN
+   2.4         SET position TO index
+   2.5     END IF
+   2.6 END FOR
+   2.7 RETURN position</pre>` },
+    { type: "order", id: "3b", q: "Put the refinement of step 6 (count club members) in order.", mono: true, items: ["SET count TO 0", "FOR index FROM 0 TO length(runners) - 1 DO", "    IF runners[index].member = true THEN", "        SET count TO count + 1", "    END IF", "END FOR"] },
+    { type: "text", html: `<h3>Flowcharts and wireframes</h3><p>Flowcharts use four symbols. A <b>wireframe</b> sketches the screen: where each input and output appears, with labels and messages.</p>` },
+    { type: "match", id: "3c", q: "Match each flowchart symbol to its use.", options: ["Start and end", "A calculation or assignment", "Data entered or displayed", "A condition with true and false exits"], items: [["Rounded rectangle (terminator)", 0], ["Rectangle (process)", 1], ["Parallelogram (input/output)", 2], ["Diamond (decision)", 3]] },
+  ],
+  exam: [
+    { type: "written", id: "3x", q: "State what is meant by data flow and explain why it is shown in a design.", marks: 2, points: ["The data passed into and out of each sub-program", "It shows which parameters each sub-program needs, so they can be implemented correctly"] },
+  ],
+},
+{
+  id: "records", num: 4, title: "Data types, arrays and records",
+  intentions: ["I can choose a suitable data type", "I can declare and use records with data classes", "I can create arrays of records and parallel arrays"],
+  recall: [
+    { type: "choice", id: "4r1", q: "Recall: which flowchart symbol shows a decision?", options: ["Rectangle", "Diamond", "Parallelogram"], correct: 1 },
+  ],
+  blocks: [
+    { type: "text", html: `<h3>Simple data types</h3><table class="tbl"><tr><th>Type</th><th>Python</th><th>Example</th></tr><tr><td>String</td><td>str</td><td>"Aileen Ross"</td></tr><tr><td>Character</td><td>str of length 1</td><td>"Y"</td></tr><tr><td>Integer</td><td>int</td><td>2875</td></tr><tr><td>Real</td><td>float</td><td>4.99</td></tr><tr><td>Boolean</td><td>bool</td><td>True</td></tr></table>` },
+    { type: "match", id: "4a", q: "Choose the most suitable data type.", options: ["String", "Character", "Integer", "Real", "Boolean"], items: [["A postcode", 0], ["A temperature to one decimal place", 3], ["Whether a seat is booked", 4], ["A shoe size letter: S, M or L", 1], ["A race time in whole seconds", 2]] },
+    { type: "text", html: `<h3>Records as data classes</h3><p>A <b>record</b> groups related fields of different types. In Python, write a record as a data class:</p><pre class="code">from dataclasses import dataclass
+
+@dataclass
+class Runner:
+    name: str = ""
+    category: str = ""
+    member: bool = False
+    seconds: int = 0
+
+runner = Runner("Aileen Ross", "V40", True, 2875)
+print(runner.name)        # Aileen Ross</pre>` },
+    { type: "code", id: "4b", q: "Write a data class <b>Book</b> with fields <span class='mono'>title</span> (string), <span class='mono'>author</span> (string), <span class='mono'>year</span> (integer), <span class='mono'>price</span> (real) and <span class='mono'>on_loan</span> (Boolean), each with a starting value. Then create one book and print its title.",
+      starter: `from dataclasses import dataclass
+
+# Write your Book data class here
+
+
+book = Book("Kidnapped", "R. L. Stevenson", 1886, 7.99, False)
+print(book.title)
+`,
+      model: `from dataclasses import dataclass
+
+@dataclass
+class Book:
+    title: str = ""
+    author: str = ""
+    year: int = 0
+    price: float = 0.0
+    on_loan: bool = False
+
+
+book = Book("Kidnapped", "R. L. Stevenson", 1886, 7.99, False)
+print(book.title)
+`,
+      cases: [{ check: `B = ns.get("Book")
+assert B is not None, "There is no Book data class."
+b = B()
+assert b.title == "" and b.author == "", "Book() should give empty strings for title and author."
+assert b.year == 0 and b.price == 0.0 and b.on_loan == False, "Book() should start year at 0, price at 0.0 and on_loan at False."
+b2 = B("A", "B", 1, 2.5, True)
+assert (b2.title, b2.author, b2.year, b2.price, b2.on_loan) == ("A", "B", 1, 2.5, True), "The fields must be in the order title, author, year, price, on_loan."
+assert "Kidnapped" in output, "The program should print the book's title."` }] },
+    { type: "text", html: `<h3>Arrays of records</h3><p>Build an array of records with a fixed loop, adding a <b>new</b> record each time:</p><pre class="code">runners = []
+for index in range(20):
+    runners.append(Runner())</pre><p>Never write <span class="mono">[Runner()] * 20</span>: that makes 20 references to <i>one</i> record.</p>` },
+    { type: "gap", id: "4c", q: "Predict the output.<pre class='code'>books = [Book()] * 3\nbooks[0].title = \"Kidnapped\"\nprint(books[2].title)</pre>", text: "Output: {{Kidnapped}}", hint: "All three elements are the same record." },
+    { type: "code", id: "4d", q: "Write a function <span class='mono'>make_runners(n)</span> that returns an array of <span class='mono'>n</span> separate <span class='mono'>Runner</span> records.",
+      starter: RUNNER_CLASS + `
+
+def make_runners(n):
+    # build and return an array of n separate Runner records
+    return []
+
+
+team = make_runners(3)
+team[0].name = "Kirsty Orr"
+print(team[0].name, "|", team[1].name, "|", len(team))
+`,
+      model: RUNNER_CLASS + `
+
+def make_runners(n):
+    runners = []
+    for index in range(n):
+        runners.append(Runner())
+    return runners
+
+
+team = make_runners(3)
+team[0].name = "Kirsty Orr"
+print(team[0].name, "|", team[1].name, "|", len(team))
+`,
+      cases: [{ check: `f = ns.get("make_runners")
+assert f is not None, "There is no make_runners function."
+t = f(4)
+assert len(t) == 4, "make_runners(4) should return 4 records."
+assert all(isinstance(r, ns["Runner"]) for r in t), "Every element should be a Runner record."
+t[0].name = "X"
+assert t[1].name == "", "Changing one record changed another: create a new Runner() each time round the loop."` }] },
+    { type: "choice", id: "4e", q: "Which is an advantage of an array of records over parallel arrays?", options: ["It uses less memory", "Each item's fields stay together, so they can't get out of step", "It can only hold integers"], correct: 1 },
+  ],
+  exam: [
+    { type: "written", id: "4x", q: "Write the reference language declaration of a record Book with fields title, author, year published, price and whether it is on loan.", marks: 2, points: ["RECORD Book IS { … } with five fields", "Correct types: STRING title, STRING author, INTEGER year, REAL price, BOOLEAN onLoan"] },
+  ],
+},
+{
+  id: "subprograms", num: 5, title: "Sub-programs, parameters and scope",
+  intentions: ["I can write procedures and functions", "I can identify formal and actual parameters", "I can explain passing by value and by reference", "I can explain local and global scope"],
+  recall: [
+    { type: "match", id: "5r1", q: "Recall: choose the data type.", options: ["String", "Integer", "Real", "Boolean"], items: [["4.99", 2], ["True", 3], ["\"V40\"", 0]] },
+  ],
+  blocks: [
+    { type: "text", html: `<h3>Procedures and functions</h3><p>A <b>procedure</b> carries out a task and returns nothing. A <b>function</b> returns one value. Python uses <span class="mono">def</span> for both: one with a <span class="mono">return</span> line is a function.</p><p><b>Formal parameters</b> are the names in the definition. <b>Actual parameters</b> are the values given in the call.</p>` },
+    { type: "gap", id: "5a", q: "<pre class='code'>def display_runner(runner):\n    print(runner.name)\n\ndisplay_runner(runners[4])</pre>", text: "Formal parameter: {{runner}}. Actual parameter: {{runners[4]}}." },
+    { type: "code", id: "5b", q: "Write a function <span class='mono'>get_grade(mark)</span> that returns <span class='mono'>\"A\"</span> for 70 or more, <span class='mono'>\"B\"</span> for 60 to 69, <span class='mono'>\"C\"</span> for 50 to 59 and <span class='mono'>\"F\"</span> otherwise.",
+      starter: `def get_grade(mark):
+    # return "A", "B", "C" or "F"
+    return ""
+
+
+print(get_grade(72), get_grade(65), get_grade(50), get_grade(12))
+`,
+      model: `def get_grade(mark):
+    if mark >= 70:
+        grade = "A"
+    elif mark >= 60:
+        grade = "B"
+    elif mark >= 50:
+        grade = "C"
+    else:
+        grade = "F"
+    return grade
+
+
+print(get_grade(72), get_grade(65), get_grade(50), get_grade(12))
+`,
+      cases: [{ check: `g = ns.get("get_grade")
+assert g is not None, "There is no get_grade function."
+for m, e in [(70, "A"), (100, "A"), (69, "B"), (60, "B"), (59, "C"), (50, "C"), (49, "F"), (0, "F")]:
+    got = g(m)
+    assert got == e, f"get_grade({m}) returned {got!r} but should return {e!r}. Check the boundary values."` }] },
+    { type: "text", html: `<h3>By value and by reference</h3><p>In Python, simple values (integer, real, string, Boolean) behave as <b>by value</b>: changes inside the sub-program don't affect the original. Arrays and records behave as <b>by reference</b>: changes to their contents change the original. To send back a changed simple value, <span class="mono">return</span> it.</p>` },
+    { type: "gap", id: "5c", q: "Predict the output.<pre class='code'>def double(number, values):\n    number = number * 2\n    values[0] = values[0] * 2\n\nn = 5\nv = [5, 6]\ndouble(n, v)\nprint(n, v)</pre>", text: "Output: {{5 [10, 6]}}", hint: "The integer is passed by value; the array by reference." },
+    { type: "code", id: "5d", q: "Write a function <span class='mono'>format_time(seconds)</span> that returns a string such as <span class='mono'>\"47 min 55 s\"</span> for 2875. Use <span class='mono'>int()</span> and <span class='mono'>%</span>.",
+      starter: `def format_time(seconds):
+    return ""
+
+
+print(format_time(2875))
+`,
+      model: `def format_time(seconds):
+    minutes = int(seconds / 60)
+    remainder = seconds % 60
+    return str(minutes) + " min " + str(remainder) + " s"
+
+
+print(format_time(2875))
+`,
+      cases: [{ check: `f = ns.get("format_time")
+assert f is not None, "There is no format_time function."
+for s, e in [(2875, "47 min 55 s"), (3720, "62 min 0 s"), (59, "0 min 59 s")]:
+    got = f(s)
+    assert got == e, f"format_time({s}) returned {got!r} but should return {e!r}."` }] },
+    { type: "choice", id: "5e", q: "Two sub-programs both use a variable called <span class='mono'>index</span> without clashing. Why?", options: ["Each index is a local variable", "index is a global variable", "Python renames one of them"], correct: 0 },
+  ],
+  exam: [
+    { type: "written", id: "5x", q: "Explain why an array of 10 000 records is normally passed by reference rather than by value.", marks: 1, points: ["By value would copy all 10 000 records, using extra memory and time; by reference passes only the location"] },
+  ],
+},
+{
+  id: "predefined", num: 6, title: "Predefined functions",
+  intentions: ["I can use substring, character to ASCII and ASCII to character", "I can use real to integer and modulus"],
+  recall: [
+    { type: "choice", id: "6r1", q: "Recall: which is passed by reference in Python?", options: ["An integer", "An array", "A string"], correct: 1 },
+  ],
+  blocks: [
+    { type: "text", html: `<table class="tbl"><tr><th>Function</th><th>Python</th><th>Example</th><th>Result</th></tr><tr><td>Substring</td><td>text[start:end]</td><td>"Catriona"[0:3]</td><td>"Cat"</td></tr><tr><td>Character to ASCII</td><td>ord()</td><td>ord("A")</td><td>65</td></tr><tr><td>ASCII to character</td><td>chr()</td><td>chr(66)</td><td>"B"</td></tr><tr><td>Real to integer</td><td>int()</td><td>int(7.9)</td><td>7</td></tr><tr><td>Modulus</td><td>a % b</td><td>2875 % 60</td><td>55</td></tr></table><p>A substring stops <b>before</b> the end index. <span class="mono">int()</span> removes the fraction; it does not round.</p>` },
+    { type: "num", id: "6a", q: "What is <span class='mono'>23 % 4</span>?", answer: 3 },
+    { type: "num", id: "6b", q: "What is <span class='mono'>int(19.99)</span>?", answer: 19 },
+    { type: "gap", id: "6c", q: "Predict each result.", text: "\"Edinburgh\"[0:4] = {{Edin}} · chr(ord(\"M\") + 1) = {{N}} · ord(\"a\") = {{97}}" },
+    { type: "gen", id: "g1", kind: "predef", title: "Practice machine: predefined functions" },
+    { type: "code", id: "6d", q: "Write <span class='mono'>make_username(first, last, year)</span> that returns the first initial, the first four letters of the surname and the last two digits of the year. <span class='mono'>make_username(\"Graeme\", \"Hunter\", 2011)</span> returns <span class='mono'>\"GHunt11\"</span>.",
+      starter: `def make_username(first, last, year):
+    return ""
+
+
+print(make_username("Graeme", "Hunter", 2011))
+`,
+      model: `def make_username(first, last, year):
+    return first[0:1] + last[0:4] + str(year % 100)
+
+
+print(make_username("Graeme", "Hunter", 2011))
+`,
+      cases: [{ check: `f = ns.get("make_username")
+assert f is not None, "There is no make_username function."
+for a, e in [(("Graeme", "Hunter", 2011), "GHunt11"), (("Kirsty", "Orr", 2025), "KOrr25"), (("Ava", "Brown", 2013), "ABrow13")]:
+    got = f(*a)
+    assert got == e, f"make_username{a} returned {got!r} but should return {e!r}."` }] },
+    { type: "code", id: "6e", q: "Write <span class='mono'>shift_letter(letter, key)</span> that shifts a capital letter <span class='mono'>key</span> places along the alphabet, wrapping from Z to A. Use <span class='mono'>ord</span>, <span class='mono'>chr</span> and <span class='mono'>%</span>.",
+      starter: `def shift_letter(letter, key):
+    return letter
+
+
+print(shift_letter("A", 3), shift_letter("Y", 3))
+`,
+      model: `def shift_letter(letter, key):
+    position = ord(letter) - 65
+    position = (position + key) % 26
+    return chr(position + 65)
+
+
+print(shift_letter("A", 3), shift_letter("Y", 3))
+`,
+      cases: [{ check: `f = ns.get("shift_letter")
+assert f is not None, "There is no shift_letter function."
+for a, e in [(("A", 3), "D"), (("Y", 3), "B"), (("Z", 1), "A"), (("M", 13), "Z"), (("C", 0), "C")]:
+    got = f(*a)
+    assert got == e, f"shift_letter{a} returned {got!r} but should return {e!r}. Remember to wrap round with % 26."` }] },
+  ],
+  exam: [
+    { type: "written", id: "6x", q: "Explain how modulus can be used to decide whether a number is even.", marks: 1, points: ["If number % 2 is 0, the remainder after dividing by 2 is zero, so the number is even"] },
+  ],
+},
+{
+  id: "files", num: 7, title: "File handling",
+  intentions: ["I can read a text or CSV file into arrays or an array of records", "I can write data to a file"],
+  recall: [
+    { type: "num", id: "7r1", q: "Recall: what is <span class='mono'>2875 % 60</span>?", answer: 55 },
+  ],
+  blocks: [
+    { type: "text", html: `<h3>Open, read, write, close</h3><table class="tbl"><tr><th>Operation</th><th>Python</th></tr><tr><td>Open to read</td><td>f = open("data.txt", "r")</td></tr><tr><td>Create / open to write</td><td>f = open("out.txt", "w")</td></tr><tr><td>Read one line</td><td>line = f.readline()</td></tr><tr><td>Write</td><td>f.write(text + "\\n")</td></tr><tr><td>Close</td><td>f.close()</td></tr></table><p><span class="mono">.strip()</span> removes the newline; <span class="mono">.split(",")</span> breaks a CSV line into fields. Every field is a string, so convert numbers with <span class="mono">int()</span> or <span class="mono">float()</span>. Opening with "w" replaces whatever the file held.</p>` },
+    { type: "order", id: "7a", q: "Put these lines in order to read <span class='mono'>results.csv</span> into parallel arrays.", mono: true, items: ["results_file = open(\"results.csv\", \"r\")", "for index in range(20):", "    fields = results_file.readline().strip().split(\",\")", "    names[index] = fields[0]", "    times[index] = int(fields[3])", "results_file.close()"] },
+    { type: "code", id: "7b", q: "<span class='mono'>scores.txt</span> holds ten whole numbers, one per line. Read them into an array, then display <span class='mono'>Total: </span> followed by their total.",
+      files: { "scores.txt": SCORES_TXT },
+      starter: `scores = [0] * 10
+
+# read scores.txt into the array, then total it
+
+
+`,
+      model: `scores = [0] * 10
+score_file = open("scores.txt", "r")
+for index in range(10):
+    scores[index] = int(score_file.readline().strip())
+score_file.close()
+
+total = 0
+for index in range(10):
+    total = total + scores[index]
+print("Total:", total)
+`,
+      cases: [{ check: `assert "Total: 85" in output or "Total:85" in output, "The program should display Total: 85 for the file given."`, }, { files: { "scores.txt": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n" }, check: `assert "55" in output, "With the numbers 1 to 10 in the file, the total should be 55. Make sure you read the file rather than typing the numbers in."` }] },
+    { type: "code", id: "7c", q: "Read <span class='mono'>pupils.csv</span> (name, form, mark) into an array of 8 <span class='mono'>Pupil</span> records, then display the name of every pupil with a mark of 50 or more.",
+      files: { "pupils.csv": PUPILS_CSV },
+      starter: `from dataclasses import dataclass
+
+@dataclass
+class Pupil:
+    name: str = ""
+    form: str = ""
+    mark: int = 0
+
+
+def read_pupils(filename):
+    pupils = []
+    # create 8 records, then fill them from the file
+    return pupils
+
+
+pupils = read_pupils("pupils.csv")
+# display the name of each pupil with 50 or more
+`,
+      model: `from dataclasses import dataclass
+
+@dataclass
+class Pupil:
+    name: str = ""
+    form: str = ""
+    mark: int = 0
+
+
+def read_pupils(filename):
+    pupils = []
+    for index in range(8):
+        pupils.append(Pupil())
+    pupil_file = open(filename, "r")
+    for index in range(8):
+        fields = pupil_file.readline().strip().split(",")
+        pupils[index].name = fields[0]
+        pupils[index].form = fields[1]
+        pupils[index].mark = int(fields[2])
+    pupil_file.close()
+    return pupils
+
+
+pupils = read_pupils("pupils.csv")
+for index in range(len(pupils)):
+    if pupils[index].mark >= 50:
+        print(pupils[index].name)
+`,
+      cases: [{ check: `p = ns.get("read_pupils")
+assert p is not None, "There is no read_pupils function."
+recs = p("pupils.csv")
+assert len(recs) == 8, "read_pupils should return 8 records."
+assert recs[1].name == "Ben Hay" and recs[1].mark == 48, "The second record should be Ben Hay with mark 48 (as an integer)."
+for name in ["Ava Brown", "Cara Lamb", "Erin Paul", "Finn Rae", "Gail Shaw"]:
+    assert name in output, f"{name} has 50 or more and should be displayed."
+for name in ["Ben Hay", "Dan Moir", "Hugh Tait"]:
+    assert name not in output, f"{name} has under 50 and should not be displayed."` }] },
+    { type: "code", id: "7d", q: "Complete <span class='mono'>write_fast(runners, filename, limit)</span> so it writes the name and time of every runner faster than <span class='mono'>limit</span> to the file, one per line, as <span class='mono'>name,seconds</span>.",
+      starter: RUNNER_CLASS + `
+
+def write_fast(runners, filename, limit):
+    pass
+
+
+team = [Runner("Aileen Ross", "V40", True, 2875), Runner("Ben Clark", "Senior", False, 3120), Runner("Graeme Hunter", "Senior", True, 2655)]
+write_fast(team, "fast.txt", 3000)
+print(open("fast.txt").read())
+`,
+      model: RUNNER_CLASS + `
+
+def write_fast(runners, filename, limit):
+    fast_file = open(filename, "w")
+    for index in range(len(runners)):
+        if runners[index].seconds < limit:
+            fast_file.write(runners[index].name + "," + str(runners[index].seconds) + "\\n")
+    fast_file.close()
+
+
+team = [Runner("Aileen Ross", "V40", True, 2875), Runner("Ben Clark", "Senior", False, 3120), Runner("Graeme Hunter", "Senior", True, 2655)]
+write_fast(team, "fast.txt", 3000)
+print(open("fast.txt").read())
+`,
+      cases: [{ check: `R = ns["Runner"]
+f = ns.get("write_fast")
+assert f is not None, "There is no write_fast function."
+f([R("A", "V40", True, 2999), R("B", "U20", False, 3000), R("C", "V50", True, 100)], "check.txt", 3000)
+lines = open("check.txt").read().strip().split("\\n")
+assert lines == ["A,2999", "C,100"], f"The file should hold the lines A,2999 and C,100 (under the limit, not equal to it). It held: {lines}"` }] },
+  ],
+  exam: [
+    { type: "written", id: "7x", q: "Explain why each line read from a file is passed through .strip() before it is used.", marks: 1, points: ["Each line ends with a newline character, which would otherwise become part of the data (for example, a name that never matches a search)"] },
+  ],
+},
+{
+  id: "algorithms", num: 8, title: "Standard algorithms",
+  intentions: ["I can write input validation", "I can write linear search and count occurrences", "I can find the maximum and minimum, by value or position"],
+  recall: [
+    { type: "choice", id: "8r1", q: "Recall: what happens to a file's contents when you open it with \"w\"?", options: ["They are kept and new lines are added", "They are deleted and replaced", "Nothing: \"w\" is read-only"], correct: 1 },
+  ],
+  blocks: [
+    { type: "text", html: `<h3>Input validation</h3><p>Keep asking until the input is acceptable. A <b>conditional loop</b> is needed because nobody knows how many attempts it will take.</p><pre class="code">age = int(input("Age: "))
+while age &lt; 11 or age &gt; 18:
+    print("Age must be from 11 to 18.")
+    age = int(input("Age: "))</pre>` },
+    { type: "code", id: "8a", q: "Write <span class='mono'>get_mark()</span> that only accepts a whole number from 0 to 100, displaying an error message for anything outside that range, and returns the valid mark.",
+      starter: `def get_mark():
+    mark = int(input("Mark (0-100): "))
+    # keep asking until the mark is valid
+    return mark
+`,
+      model: `def get_mark():
+    mark = int(input("Mark (0-100): "))
+    while mark < 0 or mark > 100:
+        print("Mark must be from 0 to 100.")
+        mark = int(input("Mark (0-100): "))
+    return mark
+`,
+      cases: [
+        { check: `set_inputs(["150", "-1", "50"])
+m = ns["get_mark"]()
+assert m == 50, f"After entering 150, -1 then 50, get_mark() returned {m!r} but should return 50."` },
+        { check: `set_inputs(["0"])
+assert ns["get_mark"]() == 0, "0 is valid (extreme data) and should be accepted first time."
+set_inputs(["101", "100"])
+assert ns["get_mark"]() == 100, "101 should be rejected and 100 accepted."` },
+      ] },
+    { type: "text", html: `<h3>Linear search</h3><p>Check each element until the target is found or the array ends, and return its <b>position</b> (or -1). A conditional loop lets it stop as soon as it finds a match.</p><pre class="code">position = -1
+index = 0
+while index &lt; len(names) and position == -1:
+    if names[index] == target:
+        position = index
+    index = index + 1</pre>` },
+    { type: "code", id: "8b", q: "Write <span class='mono'>linear_search(names, target)</span> that returns the position of <span class='mono'>target</span>, or -1 if it isn't there. Write the algorithm yourself: don't use <span class='mono'>.index()</span>.",
+      starter: `def linear_search(names, target):
+    return -1
+
+
+print(linear_search(["Ann", "Bob", "Cal"], "Bob"))
+`,
+      model: `def linear_search(names, target):
+    position = -1
+    index = 0
+    while index < len(names) and position == -1:
+        if names[index] == target:
+            position = index
+        index = index + 1
+    return position
+
+
+print(linear_search(["Ann", "Bob", "Cal"], "Bob"))
+`,
+      cases: [{ check: `f = ns.get("linear_search")
+assert f is not None, "There is no linear_search function."
+n = ["Ann", "Bob", "Cal", "Bob"]
+assert f(n, "Ann") == 0, "The first element (position 0) should be found."
+assert f(n, "Cal") == 2, "Cal is at position 2."
+assert f(n, "Bob") == 1, "Return the first match: Bob is first at position 1."
+assert f(n, "Zed") == -1, "A name that isn't there should return -1."
+assert ".index(" not in source, "Write the search yourself rather than using .index()."` }] },
+    { type: "code", id: "8c", q: "Write <span class='mono'>count_over(values, limit)</span> that returns how many values are <b>greater than</b> <span class='mono'>limit</span>.",
+      starter: `def count_over(values, limit):
+    return 0
+`,
+      model: `def count_over(values, limit):
+    count = 0
+    for index in range(len(values)):
+        if values[index] > limit:
+            count = count + 1
+    return count
+`,
+      cases: [{ check: `f = ns.get("count_over")
+assert f is not None, "There is no count_over function."
+assert f([5, 10, 15, 20], 10) == 2, "count_over([5, 10, 15, 20], 10) should be 2 (10 itself is not greater than 10)."
+assert f([1, 2, 3], 5) == 0, "Nothing over the limit should give 0."
+assert f([9, 9, 9], 0) == 3, "Every value over the limit should give 3."
+assert ".count(" not in source, "Write the algorithm yourself rather than using .count()."` }] },
+    { type: "text", html: `<h3>Find maximum and minimum</h3><p>Assume the first element is the extreme, then compare every other element with it. Returning the <b>position</b> tells you who has that value.</p><pre class="code">position = 0
+for index in range(1, len(runners)):
+    if runners[index].seconds &lt; runners[position].seconds:
+        position = index</pre>` },
+    { type: "trace", id: "8d", q: "Complete the trace table for the code above with times <span class='mono'>[3120, 2710, 3405, 2655]</span>. At the start, position is 0.", cols: ["index", "runners[index].seconds", "runners[position].seconds", "Condition <", "position after"], rows: [["1", "2710", "3120", "{{True}}", "{{1}}"], ["2", "3405", "{{2710}}", "{{False}}", "{{1}}"], ["3", "2655", "{{2710}}", "{{True}}", "{{3}}"]] },
+    { type: "code", id: "8e", q: "Write <span class='mono'>find_slowest(runners)</span> that returns the <b>position</b> of the runner with the largest time. Don't use <span class='mono'>max()</span>.",
+      starter: RUNNER_CLASS + `
+
+def find_slowest(runners):
+    return 0
+`,
+      model: RUNNER_CLASS + `
+
+def find_slowest(runners):
+    position = 0
+    for index in range(1, len(runners)):
+        if runners[index].seconds > runners[position].seconds:
+            position = index
+    return position
+`,
+      cases: [{ check: `R = ns["Runner"]
+f = ns.get("find_slowest")
+assert f is not None, "There is no find_slowest function."
+t = [R("A", "", True, 3000), R("B", "", True, 4020), R("C", "", True, 2655)]
+assert f(t) == 1, "B is slowest, at position 1."
+assert f([R("A", "", True, 9999), R("B", "", True, 1)]) == 0, "When the first runner is slowest, return 0."
+assert f([R("A", "", True, 1), R("B", "", True, 2), R("C", "", True, 3)]) == 2, "When the last runner is slowest, return 2."
+assert "max(" not in source, "Write the algorithm yourself rather than using max()."` }] },
+    { type: "gen", id: "g2", kind: "maxpos", title: "Practice machine: find the position" },
+  ],
+  exam: [
+    { type: "written", id: "8x", q: "Explain why the linear search above uses a conditional loop and the condition position == -1.", marks: 2, points: ["A conditional loop lets the search stop as soon as the target is found, so the rest of the array isn't checked", "position == -1 is true only while the item has not been found"] },
+    { type: "written", id: "8y", q: "A program finds the highest temperature by starting with maximum = 0. Describe data that gives a wrong answer.", marks: 1, points: ["Any set where every value is below 0, such as -3, -7 and -1: the program would report 0"] },
+  ],
+},
+{
+  id: "testing", num: 9, title: "Testing and debugging",
+  intentions: ["I can choose normal, extreme and exceptional test data", "I can identify syntax, execution and logic errors", "I can complete a trace table and use debugging tools"],
+  recall: [
+    { type: "order", id: "9r1", q: "Recall: order the linear search lines.", mono: true, items: ["position = -1", "index = 0", "while index < len(names) and position == -1:", "    if names[index] == target:", "        position = index", "    index = index + 1"] },
+  ],
+  blocks: [
+    { type: "text", html: `<h3>Test data</h3><p>A comprehensive test plan tests every requirement with <b>normal</b> data (accepted), <b>extreme</b> data (on the boundary, accepted) and <b>exceptional</b> data (should be rejected).</p>` },
+    { type: "match", id: "9a", q: "A mark must be from 0 to 100. Classify each test value.", options: ["Normal", "Extreme", "Exceptional"], items: [["55", 0], ["0", 1], ["100", 1], ["101", 2], ["-5", 2]] },
+    { type: "text", html: `<h3>Types of error</h3><ul><li><b>Syntax:</b> the code breaks the language's rules, so it can't run (a missing colon).</li><li><b>Execution:</b> the program crashes while running (index out of range, dividing by zero).</li><li><b>Logic:</b> it runs but gives the wrong answer (&gt; instead of &lt;).</li></ul>` },
+    { type: "match", id: "9b", q: "Which type of error?", options: ["Syntax", "Execution", "Logic"], items: [["if mark > 50 with no colon", 0], ["IndexError: list index out of range", 1], ["Find minimum returns the largest value", 2], ["print(10 / count) when count is 0", 1]] },
+    { type: "trace", id: "9c", q: "Trace <span class='mono'>count_members</span> with the member values <span class='mono'>[True, False, True, True]</span>.", cols: ["index", "runners[index].member", "count after"], rows: [["0", "True", "{{1}}"], ["1", "False", "{{1}}"], ["2", "True", "{{2}}"], ["3", "True", "{{3}}"]] },
+    { type: "code", id: "9d", q: "This function should count times <b>under</b> the limit, but it has two logic errors. Find and fix them.",
+      starter: `def count_under(times, limit):
+    count = 0
+    for index in range(1, len(times)):
+        if times[index] <= limit:
+            count = count + 1
+    return count
+
+
+print(count_under([2600, 2800, 3100], 3000))   # should be 2
+`,
+      model: `def count_under(times, limit):
+    count = 0
+    for index in range(len(times)):
+        if times[index] < limit:
+            count = count + 1
+    return count
+
+
+print(count_under([2600, 2800, 3100], 3000))   # should be 2
+`,
+      cases: [{ check: `f = ns["count_under"]
+assert f([2600, 2800, 3100], 3000) == 2, "count_under([2600, 2800, 3100], 3000) should be 2: is the first time being checked?"
+assert f([2600, 3000, 3100], 3000) == 1, "count_under([2600, 3000, 3100], 3000) should be 1: a time equal to the limit is not under it."
+assert f([1, 2], 10) == 2, "Both values are under 10."` }] },
+    { type: "match", id: "9e", q: "Match each debugging technique to its description.", options: ["Working through code by hand", "Records each variable's value at every step", "Pauses the program at a chosen line", "Pauses when a variable changes or a condition becomes true"], items: [["Dry run", 0], ["Trace table", 1], ["Breakpoint", 2], ["Watchpoint", 3]] },
+  ],
+  exam: [
+    { type: "written", id: "9x", q: "Explain how a breakpoint could help find an error inside a loop.", marks: 2, points: ["Set a breakpoint on a line inside the loop", "Each time it pauses, inspect the variables to see on which pass a value first goes wrong"] },
+  ],
+},
+{
+  id: "evaluation", num: 10, title: "Evaluation and final challenge",
+  intentions: ["I can evaluate fitness for purpose, efficiency, usability, maintainability and robustness", "I can build a complete program from a brief"],
+  recall: [
+    { type: "match", id: "10r1", q: "Recall: which type of error?", options: ["Syntax", "Execution", "Logic"], items: [["Missing closing bracket", 0], ["Using > instead of <", 2]] },
+  ],
+  blocks: [
+    { type: "text", html: `<h3>Five criteria</h3><ul><li><b>Fitness for purpose:</b> meets every functional requirement.</li><li><b>Efficient use of constructs:</b> loops and arrays instead of repeated code; elif; conditional loops that stop early.</li><li><b>Usability:</b> clear prompts, helpful error messages, readable output.</li><li><b>Maintainability:</b> meaningful names, comments, indentation, modular sub-programs with parameters.</li><li><b>Robustness:</b> copes with unexpected input without crashing.</li></ul>` },
+    { type: "match", id: "10a", q: "Which criterion does each comment evaluate?", options: ["Fitness for purpose", "Efficiency", "Usability", "Maintainability", "Robustness"], items: [["Every test in the plan gave the expected result", 0], ["An array and a loop replace twenty separate variables", 1], ["The error message says exactly which values are allowed", 2], ["Each task is a separate, well-named function", 3], ["Typing a word for the age makes the program crash", 4]] },
+    { type: "choice", id: "10b", q: "Why is <span class='mono'>if … elif … else</span> more efficient than three separate <span class='mono'>if</span> statements for a grade?", options: ["It uses fewer variables", "Once one condition is true the rest are not tested", "It runs every condition twice to check"], correct: 1 },
+    { type: "text", html: `<h3>Final challenge: Glenmore Picture House</h3><p><span class="mono">films.csv</span> holds 12 lines: title, certificate, screenings, tickets sold and ticket price. Write a program that:</p><ol><li>reads the file into an array of <span class="mono">Film</span> records;</li><li>displays <span class="mono">Total takings: £</span> and the whole-pound total (tickets × price, added up);</li><li>displays <span class="mono">Most popular:</span> and the title with the most tickets;</li><li>asks for a certificate, accepting only U, PG, 12A, 15 or 18, and displays how many films have it;</li><li>asks for a title and displays its average tickets per screening (whole number), or that it is not showing.</li></ol><p>Use separate functions with parameters. Press Run to try it: type keyboard input in the box, one value per line.</p>` },
+    { type: "code", id: "10c", q: "Build the cinema program.", files: { "films.csv": FILMS_CSV }, runInputs: "15\nStarfall",
+      starter: `from dataclasses import dataclass
+
+@dataclass
+class Film:
+    title: str = ""
+    certificate: str = ""
+    screenings: int = 0
+    tickets: int = 0
+    price: float = 0.0
+
+
+def read_films(filename):
+    films = []
+    return films
+
+
+def main():
+    films = read_films("films.csv")
+
+
+main()
+`,
+      model: `from dataclasses import dataclass
+
+@dataclass
+class Film:
+    title: str = ""
+    certificate: str = ""
+    screenings: int = 0
+    tickets: int = 0
+    price: float = 0.0
+
+
+def read_films(filename):
+    films = []
+    for index in range(12):
+        films.append(Film())
+    film_file = open(filename, "r")
+    for index in range(12):
+        fields = film_file.readline().strip().split(",")
+        films[index].title = fields[0]
+        films[index].certificate = fields[1]
+        films[index].screenings = int(fields[2])
+        films[index].tickets = int(fields[3])
+        films[index].price = float(fields[4])
+    film_file.close()
+    return films
+
+
+def calculate_takings(films):
+    total = 0.0
+    for index in range(len(films)):
+        total = total + films[index].tickets * films[index].price
+    return total
+
+
+def find_most_popular(films):
+    position = 0
+    for index in range(1, len(films)):
+        if films[index].tickets > films[position].tickets:
+            position = index
+    return position
+
+
+def get_certificate():
+    certificate = input("Certificate (U, PG, 12A, 15, 18): ")
+    while certificate != "U" and certificate != "PG" and certificate != "12A" and certificate != "15" and certificate != "18":
+        print("Certificate must be U, PG, 12A, 15 or 18.")
+        certificate = input("Certificate (U, PG, 12A, 15, 18): ")
+    return certificate
+
+
+def count_certificate(films, certificate):
+    count = 0
+    for index in range(len(films)):
+        if films[index].certificate == certificate:
+            count = count + 1
+    return count
+
+
+def search_film(films, target):
+    position = -1
+    index = 0
+    while index < len(films) and position == -1:
+        if films[index].title == target:
+            position = index
+        index = index + 1
+    return position
+
+
+def main():
+    films = read_films("films.csv")
+    print("Total takings: £" + str(int(calculate_takings(films))))
+    popular = find_most_popular(films)
+    print("Most popular:", films[popular].title)
+    certificate = get_certificate()
+    print(count_certificate(films, certificate), "films have certificate", certificate)
+    target = input("Film title: ")
+    found = search_film(films, target)
+    if found == -1:
+        print(target, "is not showing this week.")
+    else:
+        print(films[found].title, "averaged", int(films[found].tickets / films[found].screenings), "tickets per screening")
+
+
+main()
+`,
+      cases: [
+        { inputs: ["15", "Starfall"], check: `import re
+lines = output.split("\\n")
+assert "87592" in output, "Total takings should be £87592 for this file."
+assert any("popular" in l.lower() and "Starfall" in l for l in lines), "Display Most popular: followed by Starfall."
+assert any(re.search(r"\\b3\\b", l) and "15" in l for l in lines), "Show that 3 films have certificate 15."
+assert "137" in output, "Starfall averaged 137 tickets per screening (2740 / 20)."` },
+        { inputs: ["X", "18", "Nope"], check: `import re
+lines = output.split("\\n")
+assert inputs_left() == 0, "An invalid certificate such as X should be rejected and asked for again, then the title asked for."
+assert any(re.search(r"\\b2\\b", l) and "18" in l for l in lines), "Show that 2 films have certificate 18."
+assert "not showing" in output.lower() or "not found" in output.lower(), "A title that isn't in the file should say it is not showing."` },
+      ] },
+  ],
+  exam: [
+    { type: "written", id: "10x", q: "Describe two features of your cinema program that make it maintainable.", marks: 2, points: ["Meaningful names, such as find_most_popular", "Separate sub-programs with parameters and local variables (or comments, indentation)"] },
+  ],
+},
+];
+
+// ---------- state ----------
+const KEY = BOOK.key;
+let S = { tasks: {}, rag: {} };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) { /* storage unavailable */ }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ } }
+const T = (id) => (S.tasks[id] = S.tasks[id] || { att: 0 });
+const isDone = (id) => { const t = S.tasks[id]; return !!t && ["correct", "shown", "marked"].includes(t.s); };
+
+const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const el = (html) => { const d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstChild; };
+
+function countable(ch) { return [...ch.recall, ...ch.blocks, ...ch.exam].filter((b) => !["text", "figure", "gen", "dbview"].includes(b.type)); }
+function progress(ch) { const items = countable(ch); const done = items.filter((b) => isDone(b.id)).length; return { done, total: items.length }; }
+
+// ---------- task shell ----------
+function shell(b, label, body, extra = "") {
+  const t = S.tasks[b.id];
+  const status = t && t.s === "correct" ? "is-correct" : t && t.s === "shown" ? "is-shown" : t && t.s === "marked" ? "is-marked" : "";
+  return `<section class="task ${status}" data-id="${b.id}" id="task-${b.id}">
+    <div class="task-head"><span class="tag">${label}</span>${b.marks ? `<span class="marks">${b.marks} mark${b.marks > 1 ? "s" : ""}</span>` : ""}</div>
+    <div class="q">${b.q}</div>${body}
+    <div class="actions">${extra}${b.hint ? `<button class="ghost hint-btn" type="button">Hint</button>` : ""}<button class="ghost show-btn" type="button" ${t && t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show answer</button></div>
+    ${b.hint ? `<div class="hint" hidden>${b.hint}</div>` : ""}
+    <div class="feedback" aria-live="polite">${t && t.s === "correct" ? "Correct." : t && t.s === "shown" ? "Answer shown. Try the next one on your own." : ""}</div></section>`;
+}
+const checkBtn = `<button class="primary check-btn" type="button">Check</button>`;
+
+function placeRow(kind, n) {
+  if (kind === "none") return "";
+  const vals = [];
+  for (let i = 0; i < n; i++) vals.push(2 ** (n - 1 - i));
+  if (kind === "twos") vals[0] = "−" + vals[0];
+  return `<div class="bitrow places">${vals.map((v) => `<span>${v}</span>`).join("")}</div>`;
+}
+function bitCells(group, n, values) {
+  let h = "";
+  for (let i = 0; i < n; i++) h += `<button type="button" class="bit" data-group="${group}" data-i="${i}" aria-label="${group} bit ${i + 1}">${values ? values[i] : "0"}</button>`;
+  return h;
+}
+
+// ---------- renderers ----------
+const R = {
+  num(b, label) {
+    const t = S.tasks[b.id] || {};
+    return shell(b, label, `<div class="answer-row"><input type="text" inputmode="decimal" autocomplete="off" id="in-${b.id}" aria-label="Your answer" value="${esc(t.v ?? "")}"></div>`, checkBtn);
+  },
+  gap(b, label) {
+    const t = S.tasks[b.id] || {};
+    let k = 0;
+    const html = b.text.replace(/\{\{([^}]+)\}\}/g, (m, a) => { const i = k++; const v = (t.v || [])[i] ?? ""; return `<input class="gap" type="text" autocomplete="off" data-k="${i}" aria-label="Gap ${i + 1}" style="width:${Math.max(4, a.split("|")[0].length + 2)}ch" value="${esc(v)}">`; });
+    return shell(b, label, `<p class="gap-text">${html}</p>`, checkBtn);
+  },
+  bits(b, label) {
+    const t = S.tasks[b.id] || {};
+    return shell(b, label, `<div class="bits">${placeRow(b.places || "twos", b.n)}<div class="bitrow">${bitCells("b", b.n, t.v)}</div></div><p class="small">Click a bit to change it.</p>`, checkBtn);
+  },
+  fp(b, label) {
+    const t = S.tasks[b.id] || {};
+    const v = t.v || {};
+    return shell(b, label, `<div class="fp">
+      <div class="fp-part"><span class="fp-label">Sign</span><div class="bitrow">${bitCells("s", 1, v.s)}</div></div>
+      <div class="fp-part"><span class="fp-label">Mantissa (15 bits)</span><div class="bitrow">${bitCells("m", 15, v.m)}</div></div>
+      <div class="fp-part"><span class="fp-label">Exponent (8 bits)</span><div class="bitrow">${bitCells("e", 8, v.e)}</div></div></div><p class="small">Click a bit to change it.</p>`, checkBtn);
+  },
+  choice(b, label) {
+    const t = S.tasks[b.id] || {};
+    return shell(b, label, `<div class="opts">${b.options.map((o, i) => `<button type="button" class="opt ${t.v === i ? "picked" : ""}" data-i="${i}">${o}</button>`).join("")}</div>`);
+  },
+  multi(b, label) {
+    const t = S.tasks[b.id] || {};
+    const v = t.v || [];
+    return shell(b, label, `<div class="opts">${b.options.map((o, i) => `<button type="button" class="opt toggle ${v.includes(i) ? "picked" : ""}" aria-pressed="${v.includes(i)}" data-i="${i}">${o}</button>`).join("")}</div>`, checkBtn);
+  },
+  match(b, label) {
+    const t = S.tasks[b.id] || {};
+    const v = t.v || [];
+    return shell(b, label, `<div class="match">${b.items.map((it, i) => `<label class="match-row"><span>${it[0]}</span><select data-k="${i}" aria-label="${esc(it[0])}"><option value="">Choose…</option>${b.options.map((o, j) => `<option value="${j}" ${String(v[i]) === String(j) ? "selected" : ""}>${o}</option>`).join("")}</select></label>`).join("")}</div>`, checkBtn);
+  },
+  order(b, label) {
+    const t = S.tasks[b.id] || {};
+    const shown = seededShuffle(b.items, b.id);
+    const v = t.v || [];
+    return shell(b, label, `<div class="match">${shown.map((it, i) => `<label class="match-row"><span class="${b.mono ? "mono-line" : ""}">${b.mono ? esc(it) : it}</span><select data-k="${i}" aria-label="Position of ${esc(it)}"><option value="">#</option>${b.items.map((_, j) => `<option value="${j + 1}" ${String(v[i]) === String(j + 1) ? "selected" : ""}>${j + 1}</option>`).join("")}</select></label>`).join("")}</div>`, checkBtn);
+  },
+  written(b, label) {
+    const t = S.tasks[b.id] || {};
+    const marked = t.s === "marked";
+    return shell(b, label, `<textarea rows="${Math.max(3, b.marks * 2)}" id="in-${b.id}" aria-label="Your answer">${esc(t.v || "")}</textarea>
+      <div class="points" ${marked ? "" : "hidden"}><p class="small">Tick each marking point your answer makes.</p>${b.points.map((p, i) => `<label class="point"><input type="checkbox" data-k="${i}" ${(t.ticks || []).includes(i) ? "checked" : ""}> <span>${p}</span></label>`).join("")}<p class="score">${marked ? `You gave yourself ${(t.ticks || []).length} of ${b.marks}.` : ""}</p></div>`,
+      `<button class="primary mark-btn" type="button">${marked ? "Hide marking points" : "Mark my answer"}</button>`);
+  },
+  trace(b, label) {
+    const t = S.tasks[b.id] || {};
+    let k = 0;
+    const cellHtml = (c) => c.replace(/\{\{([^}]+)\}\}/g, (m, a) => { const i = k++; const v = (t.v || [])[i] ?? ""; return `<input class="gap" type="text" autocomplete="off" data-k="${i}" aria-label="Trace cell ${i + 1}" style="width:${Math.max(5, a.split("|")[0].length + 2)}ch" value="${esc(v)}">`; });
+    return shell(b, label, `<div class="trace-wrap"><table class="tbl trace"><tr>${b.cols.map((c) => `<th>${c}</th>`).join("")}</tr>${b.rows.map((r) => `<tr>${r.map((c) => `<td class="mono">${cellHtml(c)}</td>`).join("")}</tr>`).join("")}</table></div>`, checkBtn);
+  },
+  code(b, label) {
+    const t = S.tasks[b.id] || {};
+    const src = t.v ?? b.starter;
+    const files = Object.keys(b.files || {});
+    return `<section class="task code-task ${t.s === "correct" ? "is-correct" : t.s === "shown" ? "is-shown" : ""}" data-id="${b.id}" id="task-${b.id}">
+      <div class="task-head"><span class="tag">${label}</span><span class="marks">Python</span></div>
+      <div class="q">${b.q}</div>
+      ${files.length ? `<details class="files"><summary>Files this program can open: ${files.map((f) => `<span class="mono">${f}</span>`).join(", ")}</summary>${files.map((f) => `<p class="small mono">${f}</p><pre class="code">${esc(b.files[f])}</pre>`).join("")}</details>` : ""}
+      <textarea class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(26, Math.max(8, src.split("\n").length + 1))}" aria-label="Your Python code">${esc(src)}</textarea>
+      <label class="stdin-label small">Keyboard input for Run, one value per line <textarea class="stdin" rows="2" spellcheck="false" aria-label="Keyboard input for Run">${esc(t.stdin ?? b.runInputs ?? "")}</textarea></label>
+      <div class="actions"><button class="ghost run-btn" type="button">Run</button><button class="primary code-check" type="button">Check</button><button class="ghost reset-code" type="button">Reset code</button><button class="ghost model-btn" type="button" ${t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show model answer</button></div>
+      <div class="higher-note" hidden></div>
+      <pre class="console" hidden></pre>
+      <div class="feedback" aria-live="polite">${t.s === "correct" ? "All tests passed." : ""}</div>
+      <div class="model" hidden><p class="small"><b>Model answer.</b> Compare it with yours, then try writing it again without looking.</p><pre class="code">${esc(b.model)}</pre></div>
+    </section>`;
+  },
+  web(b, label) {
+    const t = S.tasks[b.id] || {};
+    const src = t.v ?? b.starter;
+    return `<section class="task code-task web-task ${t.s === "correct" ? "is-correct" : t.s === "shown" ? "is-shown" : ""}" data-id="${b.id}" id="task-${b.id}">
+      <div class="task-head"><span class="tag">${label}</span><span class="marks">${b.lang || "HTML"}</span></div>
+      <div class="q">${b.q}</div>
+      <div class="web-grid"><textarea class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(28, Math.max(10, src.split("\n").length + 1))}" aria-label="Your code">${esc(src)}</textarea>
+      <div class="preview-wrap"><p class="small">Preview</p><iframe class="preview" title="Preview of your page" sandbox="allow-scripts allow-same-origin"></iframe></div></div>
+      <div class="actions"><button class="ghost run-btn" type="button">Update preview</button><button class="primary code-check" type="button">Check</button><button class="ghost reset-code" type="button">Reset code</button><button class="ghost model-btn" type="button" ${t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show model answer</button></div>
+      <div class="feedback" aria-live="polite">${t.s === "correct" ? "All checks passed." : ""}</div>
+      <div class="model" hidden><p class="small"><b>Model answer.</b> Compare it with yours, then try writing it again without looking.</p><pre class="code">${esc(b.model)}</pre></div>
+    </section>`;
+  },
+  sql(b, label) {
+    const t = S.tasks[b.id] || {};
+    const src = t.v ?? b.starter ?? "";
+    return `<section class="task code-task sql-task ${t.s === "correct" ? "is-correct" : t.s === "shown" ? "is-shown" : ""}" data-id="${b.id}" id="task-${b.id}">
+      <div class="task-head"><span class="tag">${label}</span><span class="marks">SQL</span></div>
+      <div class="q">${b.q}</div>
+      <textarea class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(14, Math.max(4, src.split("\n").length + 1))}" aria-label="Your SQL">${esc(src)}</textarea>
+      <div class="actions"><button class="ghost run-btn" type="button">Run</button><button class="primary code-check" type="button">Check</button><button class="ghost reset-code" type="button">Reset</button><button class="ghost model-btn" type="button" ${t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show model answer</button></div>
+      <div class="sql-out"></div>
+      <div class="feedback" aria-live="polite">${t.s === "correct" ? "Correct: your results match." : ""}</div>
+      <div class="model" hidden><p class="small"><b>Model answer.</b> Other correct versions are possible.</p><pre class="code">${esc(b.model)}</pre></div>
+    </section>`;
+  },
+  dbview() {
+    return `<details class="dbview"><summary>Show the database tables</summary><div class="dbview-body">${Object.entries(DB.tables).map(([name, tb]) => `<h4 class="mono">${name}</h4><div class="trace-wrap"><table class="tbl result">${`<tr>${tb.cols.map((c) => `<th>${c}</th>`).join("")}</tr>`}${tb.rows.map((r) => `<tr>${r.map((v) => `<td>${esc(v === null ? "" : v === true ? "True" : v === false ? "False" : v)}</td>`).join("")}</tr>`).join("")}</table></div>`).join("")}</div></details>`;
+  },
+  text(b) { return `<div class="prose">${b.html}</div>`; },
+  figure(b) { return `<figure class="fig">${b.html}</figure>`; },
+  gen(b) {
+    return `<section class="task gen" data-id="${b.id}" data-kind="${b.kind}"><div class="task-head"><span class="tag gen-tag">Practice machine</span><span class="streak" aria-live="polite"></span></div><div class="q gen-title">${b.title}</div><div class="gen-body"></div>
+      <div class="actions"><button class="primary gen-check" type="button">Check</button><button class="ghost gen-new" type="button">New question</button><button class="ghost gen-show" type="button" hidden>Show answer</button></div><div class="feedback" aria-live="polite"></div></section>`;
+  },
+};
+
+// ---------- reading answers ----------
+const readBits = (node, g) => [...node.querySelectorAll(`.bit[data-group="${g}"]`)].map((x) => x.textContent).join("");
+function markBits(node, g, answer) {
+  node.querySelectorAll(`.bit[data-group="${g}"]`).forEach((x, i) => x.classList.toggle("wrong", x.textContent !== answer[i]));
+}
+function fillBits(node, g, answer) { node.querySelectorAll(`.bit[data-group="${g}"]`).forEach((x, i) => { x.textContent = answer[i]; x.classList.remove("wrong"); }); }
+
+function evaluate(b, node) {
+  switch (b.type) {
+    case "num": { const v = node.querySelector("input").value; return { v, ok: sameNumber(v, b.answer) }; }
+    case "gap": {
+      const ins = [...node.querySelectorAll("input.gap")];
+      const answers = [...b.text.matchAll(/\{\{([^}]+)\}\}/g)].map((m) => m[1].split("|"));
+      const v = ins.map((i) => i.value);
+      let ok = true;
+      ins.forEach((inp, i) => { const good = sameText(inp.value, answers[i]); inp.classList.toggle("wrong", !good); if (!good) ok = false; });
+      return { v, ok };
+    }
+    case "trace": {
+      const ins = [...node.querySelectorAll("input.gap")];
+      const answers = [...b.rows.flat().join("\u0001").matchAll(/\{\{([^}]+)\}\}/g)].map((m) => m[1].split("|"));
+      const v = ins.map((i) => i.value);
+      let ok = true;
+      ins.forEach((inp, i) => { const good = sameText(inp.value, answers[i]); inp.classList.toggle("wrong", !good); if (!good) ok = false; });
+      return { v, ok };
+    }
+    case "bits": { const v = readBits(node, "b"); markBits(node, "b", b.answer); return { v: v.split(""), ok: v === b.answer }; }
+    case "fp": {
+      const a = fpEncode(b.value);
+      const v = { s: readBits(node, "s").split(""), m: readBits(node, "m").split(""), e: readBits(node, "e").split("") };
+      markBits(node, "s", a.sign); markBits(node, "m", a.mantissa); markBits(node, "e", a.exponent);
+      return { v, ok: v.s.join("") === a.sign && v.m.join("") === a.mantissa && v.e.join("") === a.exponent };
+    }
+    case "multi": {
+      const v = [...node.querySelectorAll(".opt.picked")].map((x) => Number(x.dataset.i));
+      const ok = v.length === b.correct.length && b.correct.every((c) => v.includes(c));
+      return { v, ok };
+    }
+    case "match": {
+      const sels = [...node.querySelectorAll("select")];
+      const v = sels.map((s) => s.value);
+      let ok = true;
+      sels.forEach((s, i) => { const good = s.value !== "" && Number(s.value) === b.items[i][1]; s.classList.toggle("wrong", !good); if (!good) ok = false; });
+      return { v, ok };
+    }
+    case "order": {
+      const shown = seededShuffle(b.items, b.id);
+      const sels = [...node.querySelectorAll("select")];
+      const v = sels.map((s) => s.value);
+      let ok = true;
+      sels.forEach((s, i) => { const good = Number(s.value) === b.items.indexOf(shown[i]) + 1; s.classList.toggle("wrong", !good); if (!good) ok = false; });
+      return { v, ok };
+    }
+  }
+}
+function revealAnswer(b, node) {
+  switch (b.type) {
+    case "num": node.querySelector("input").value = b.answer; break;
+    case "gap": { const answers = [...b.text.matchAll(/\{\{([^}]+)\}\}/g)].map((m) => m[1].split("|")[0]); node.querySelectorAll("input.gap").forEach((inp, i) => { inp.value = answers[i]; inp.classList.remove("wrong"); }); break; }
+    case "trace": { const answers = [...b.rows.flat().join("\u0001").matchAll(/\{\{([^}]+)\}\}/g)].map((m) => m[1].split("|")[0]); node.querySelectorAll("input.gap").forEach((inp, i) => { inp.value = answers[i]; inp.classList.remove("wrong"); }); break; }
+    case "bits": fillBits(node, "b", b.answer); break;
+    case "fp": { const a = fpEncode(b.value); fillBits(node, "s", a.sign); fillBits(node, "m", a.mantissa); fillBits(node, "e", a.exponent); break; }
+    case "choice": node.querySelectorAll(".opt").forEach((x) => x.classList.toggle("picked", Number(x.dataset.i) === b.correct)); break;
+    case "multi": node.querySelectorAll(".opt").forEach((x) => x.classList.toggle("picked", b.correct.includes(Number(x.dataset.i)))); break;
+    case "match": node.querySelectorAll("select").forEach((s, i) => { s.value = b.items[i][1]; s.classList.remove("wrong"); }); break;
+    case "order": { const shown = seededShuffle(b.items, b.id); node.querySelectorAll("select").forEach((s, i) => { s.value = b.items.indexOf(shown[i]) + 1; s.classList.remove("wrong"); }); break; }
+  }
+}
+
+// ---------- generators ----------
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = (arr) => arr[rnd(0, arr.length - 1)];
+const GEN = {
+  twos() { const n = rnd(-128, -1); return { q: `Represent <b>${n}</b> in 8-bit two's complement.`, input: "bits", n: 8, answer: toTwos(n, 8) }; },
+  fromTwos() { const n = rnd(-128, -1); return { q: `Convert <span class="mono">${toTwos(n, 8)}</span> to denary.`, input: "num", answer: n }; },
+  fp() { const fr = pick([0, 0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875]); let v = rnd(0, 40) + fr; if (v === 0) v = 0.75; if (Math.random() < 0.4) v = -v; return { q: `Represent <b>${v}</b> in floating point (sign, 15-bit mantissa, 8-bit exponent).`, input: "fp", value: v }; },
+  fpToDen() { const fr = pick([0.5, 0.25, 0.75, 0.125, 0.375]); let v = rnd(0, 20) + fr; if (Math.random() < 0.4) v = -v; const a = fpEncode(v); return { q: `Convert to denary: sign <span class="mono">${a.sign}</span>, mantissa <span class="mono">${a.mantissa}</span>, exponent <span class="mono">${a.exponent}</span>.`, input: "num", answer: v }; },
+  text() { const c = pick([250, 500, 1200, 1500, 2000, 4000]); const bits = pick([8, 16, 32]); return { q: `How many bytes are needed for <b>${c}</b> characters in ${bits === 8 ? "8-bit extended ASCII" : bits + "-bit Unicode"}?`, input: "num", answer: (c * bits) / 8 }; },
+  bitmap() { const w = pick([640, 800, 1024, 1280, 1920]); const h = pick([480, 600, 720, 768, 1080]); const d = pick([1, 8, 16, 24]); return { q: `What is the file size in <b>bytes</b> of a ${w} × ${h} image with a colour depth of ${d} bit${d > 1 ? "s" : ""}?`, input: "num", answer: (w * h * d) / 8 }; },
+
+  predef() {
+    const words = ["Glasgow", "Inverness", "Aberdeen", "Stirling", "Dundee", "Kirkwall", "Paisley"];
+    const kind = pick(["mod", "int", "sub", "ord", "chr"]);
+    if (kind === "mod") { const x = rnd(10, 99), y = rnd(2, 9); return { q: `What is <span class="mono">${x} % ${y}</span>?`, input: "num", answer: x % y }; }
+    if (kind === "int") { const x = rnd(10, 99), y = rnd(2, 9); return { q: `What is <span class="mono">int(${x} / ${y})</span>?`, input: "num", answer: Math.floor(x / y) }; }
+    if (kind === "sub") { const w = pick(words), a = rnd(0, 2), e = a + rnd(2, 4); return { q: `What is <span class="mono">"${w}"[${a}:${e}]</span>?`, input: "text", answer: w.slice(a, e) }; }
+    if (kind === "ord") { const c = String.fromCharCode(pick([rnd(65, 90), rnd(97, 122)])); return { q: `What is <span class="mono">ord("${c}")</span>?`, input: "num", answer: c.charCodeAt(0) }; }
+    const n = rnd(65, 90); return { q: `What is <span class="mono">chr(${n})</span>?`, input: "text", answer: String.fromCharCode(n) };
+  },
+  maxpos() {
+    const vals = []; while (vals.length < 6) { const v = rnd(2500, 4200); if (!vals.includes(v)) vals.push(v); }
+    const findMax = Math.random() < 0.5; let pos = 0;
+    for (let i = 1; i < vals.length; i++) if (findMax ? vals[i] > vals[pos] : vals[i] < vals[pos]) pos = i;
+    return { q: `<span class="mono">times = [${vals.join(", ")}]</span><br>Find-${findMax ? "maximum" : "minimum"} returns a position. What position does it return? (The first element is position 0.)`, input: "num", answer: pos };
+  },
+};
+const genState = {};
+function newGen(node) {
+  const kind = node.dataset.kind;
+  const g = GEN[kind]();
+  const st = (genState[node.dataset.id] = genState[node.dataset.id] || { streak: 0, done: 0 });
+  st.cur = g; st.att = 0; st.solved = false;
+  let body = `<p class="q">${g.q}</p>`;
+  if (g.input === "num") body += `<div class="answer-row"><input type="text" inputmode="decimal" autocomplete="off" aria-label="Your answer"></div>`;
+  if (g.input === "text") body += `<div class="answer-row"><input type="text" autocomplete="off" aria-label="Your answer"></div>`;
+  if (g.input === "bits") body += `<div class="bits">${placeRow("twos", 8)}<div class="bitrow">${bitCells("b", 8)}</div></div>`;
+  if (g.input === "fp") body += `<div class="fp"><div class="fp-part"><span class="fp-label">Sign</span><div class="bitrow">${bitCells("s", 1)}</div></div><div class="fp-part"><span class="fp-label">Mantissa (15 bits)</span><div class="bitrow">${bitCells("m", 15)}</div></div><div class="fp-part"><span class="fp-label">Exponent (8 bits)</span><div class="bitrow">${bitCells("e", 8)}</div></div></div>`;
+  node.querySelector(".gen-body").innerHTML = body;
+  node.querySelector(".feedback").textContent = "";
+  node.querySelector(".gen-show").hidden = true;
+  node.classList.remove("is-correct");
+  updateStreak(node);
+}
+function updateStreak(node) { const st = genState[node.dataset.id]; node.querySelector(".streak").textContent = st && st.done ? `${st.done} solved · streak ${st.streak}` : ""; }
+function checkGen(node) {
+  const st = genState[node.dataset.id]; const g = st.cur; let ok;
+  if (g.input === "num") ok = sameNumber(node.querySelector(".gen-body input").value, g.answer);
+  if (g.input === "text") ok = node.querySelector(".gen-body input").value.trim().replace(/^["']|["']$/g, "") === g.answer;
+  if (g.input === "bits") { ok = readBits(node, "b") === g.answer; markBits(node, "b", g.answer); }
+  if (g.input === "fp") { const a = fpEncode(g.value); ok = readBits(node, "s") === a.sign && readBits(node, "m") === a.mantissa && readBits(node, "e") === a.exponent; markBits(node, "s", a.sign); markBits(node, "m", a.mantissa); markBits(node, "e", a.exponent); }
+  const fb = node.querySelector(".feedback");
+  if (ok && !st.solved) { st.solved = true; st.done++; st.streak = st.att === 0 ? st.streak + 1 : 0; fb.textContent = "Correct. Press New question for another."; node.classList.add("is-correct"); }
+  else if (!ok) { st.att++; fb.textContent = "Not yet. Red bits or values are wrong; try again."; if (st.att >= 2) node.querySelector(".gen-show").hidden = false; }
+  updateStreak(node);
+}
+function showGen(node) {
+  const st = genState[node.dataset.id]; const g = st.cur;
+  if (g.input === "num" || g.input === "text") node.querySelector(".gen-body input").value = g.answer;
+  if (g.input === "bits") fillBits(node, "b", g.answer);
+  if (g.input === "fp") { const a = fpEncode(g.value); fillBits(node, "s", a.sign); fillBits(node, "m", a.mantissa); fillBits(node, "e", a.exponent); }
+  st.streak = 0; st.solved = true; updateStreak(node);
+  node.querySelector(".feedback").textContent = "Answer shown. Press New question and try another.";
+}
+
+// ---------- Python in a background worker ----------
+const PY_INDEX = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+const HARNESS = "def __run(src, inputs, check, files):\n    import io, contextlib, traceback\n    for name in files:\n        with open(name, \"w\") as handle:\n            handle.write(files[name])\n    queue = list(inputs)\n    buf = io.StringIO()\n\n    def fake_input(prompt=\"\"):\n        buf.write(str(prompt))\n        if not queue:\n            raise EOFError(\"the program asked for more keyboard input than was given\")\n        value = queue.pop(0)\n        buf.write(value + \"\\n\")\n        return value\n\n    def set_inputs(values):\n        queue[:] = list(values)\n\n    def inputs_left():\n        return len(queue)\n\n    def where(err):\n        line = None\n        for frame in traceback.extract_tb(err.__traceback__):\n            if frame.filename == \"your_program.py\":\n                line = frame.lineno\n        return line\n\n    ns = {\"__name__\": \"__main__\", \"input\": fake_input}\n    status, message = \"ok\", \"\"\n    try:\n        code = compile(src, \"your_program.py\", \"exec\")\n        with contextlib.redirect_stdout(buf):\n            exec(code, ns)\n    except SyntaxError as err:\n        status, message = \"syntax\", \"Syntax error on line \" + str(err.lineno) + \": \" + str(err.msg)\n    except BaseException as err:\n        line = where(err)\n        status = \"execution\"\n        message = \"Execution error\" + (\" on line \" + str(line) if line else \"\") + \": \" + type(err).__name__ + \": \" + str(err)\n    output = buf.getvalue()\n    if status == \"ok\" and check:\n        env = {\"ns\": ns, \"output\": output, \"source\": src, \"set_inputs\": set_inputs, \"inputs_left\": inputs_left}\n        quiet = io.StringIO()\n        try:\n            with contextlib.redirect_stdout(quiet):\n                exec(check, env)\n        except AssertionError as err:\n            status, message = \"fail\", str(err)\n        except BaseException as err:\n            line = where(err)\n            status = \"execution\"\n            message = \"Your code raised \" + type(err).__name__ + \": \" + str(err) + (\" (line \" + str(line) + \")\" if line else \"\")\n    return {\"status\": status, \"output\": output, \"message\": message}\n";
+let pyWorker = null, pyReady = null, pyReq = 0;
+const pyPending = {};
+function startPython() {
+  const src = `importScripts(${JSON.stringify(PY_INDEX + "pyodide.js")});
+let py;
+const ready = loadPyodide({ indexURL: ${JSON.stringify(PY_INDEX)} }).then((p) => { py = p; py.runPython(${JSON.stringify(HARNESS)}); postMessage({ type: "ready" }); }).catch((e) => postMessage({ type: "loadfail", error: String(e) }));
+onmessage = async (e) => {
+  const d = e.data;
+  try {
+    await ready;
+    py.globals.set("__args", py.toPy(d));
+    const r = py.runPython("__run(__args['src'], __args['inputs'], __args['check'], __args['files'])");
+    const out = r.toJs({ dict_converter: Object.fromEntries });
+    r.destroy();
+    postMessage(Object.assign({ type: "result", id: d.id }, out));
+  } catch (err) {
+    postMessage({ type: "result", id: d.id, status: "execution", output: "", message: String(err) });
+  }
+};`;
+  pyWorker = new Worker(URL.createObjectURL(new Blob([src], { type: "text/javascript" })));
+  pyReady = new Promise((resolve, reject) => {
+    pyWorker.onmessage = (e) => {
+      const m = e.data;
+      if (m.type === "ready") resolve();
+      else if (m.type === "loadfail") reject(new Error(m.error));
+      else if (m.type === "result" && pyPending[m.id]) { clearTimeout(pyPending[m.id].timer); pyPending[m.id].resolve(m); delete pyPending[m.id]; }
+    };
+    pyWorker.onerror = (e) => reject(e);
+  });
+  pyReady.catch(() => { if (pyWorker) pyWorker.terminate(); pyWorker = null; });
+}
+async function runPython(src, inputs, check, files) {
+  if (!pyWorker) startPython();
+  await pyReady;
+  return new Promise((resolve) => {
+    const id = ++pyReq;
+    const timer = setTimeout(() => {
+      if (pyWorker) pyWorker.terminate();
+      pyWorker = null;
+      delete pyPending[id];
+      resolve({ status: "timeout", output: "", message: "Your program ran for more than 5 seconds, so it was stopped. Look for a loop that never ends." });
+    }, 5000);
+    pyPending[id] = { resolve, timer };
+    pyWorker.postMessage({ id, src, inputs, check, files });
+  });
+}
+
+const HIGHER_RULES = [
+  [/\bbreak\b/, "<span class='mono'>break</span> isn't in the Higher course: use a conditional loop that stops when its condition is met."],
+  [/\btry\s*:/, "<span class='mono'>try</span>/<span class='mono'>except</span> isn't in the Higher course: validate input with a conditional loop instead."],
+  [/\b(max|min|sum)\s*\(/, "Built-in <span class='mono'>max()</span>, <span class='mono'>min()</span> and <span class='mono'>sum()</span> do the standard algorithms for you: in the exam you must write the loop yourself."],
+  [/\.sort\s*\(|\bsorted\s*\(/, "Sorting isn't in the Higher course."],
+  [/\.index\s*\(|\.count\s*\(/, "<span class='mono'>.index()</span> and <span class='mono'>.count()</span> replace the linear search and count occurrences algorithms: write the loop yourself."],
+  [/\[[^\]\n]*\bfor\b[^\]\n]*\bin\b[^\]\n]*\]/, "List comprehensions aren't in the Higher course: build the array with a fixed loop."],
+];
+function higherNote(node, src) {
+  const notes = HIGHER_RULES.filter(([re]) => re.test(src.replace(/#.*$/gm, ""))).map(([, msg]) => `<li>${msg}</li>`);
+  const box = node.querySelector(".higher-note");
+  box.hidden = !notes.length;
+  box.innerHTML = notes.length ? `<b>Higher check</b><ul>${notes.join("")}</ul>` : "";
+}
+function showConsole(node, text, isError) {
+  const c = node.querySelector(".console");
+  c.hidden = false;
+  c.classList.toggle("err", !!isError);
+  c.textContent = text || "(no output)";
+}
+async function codeRun(b, node, mode) {
+  const src = node.querySelector(".editor").value;
+  const fb = node.querySelector(".feedback");
+  const btns = node.querySelectorAll(".run-btn, .code-check");
+  btns.forEach((x) => (x.disabled = true));
+  higherNote(node, src);
+  fb.textContent = pyWorker ? (mode === "run" ? "Running…" : "Testing…") : "Loading Python. The first time takes about 10 seconds…";
+  try {
+    if (mode === "run") {
+      const inputs = node.querySelector(".stdin").value.split("\n").filter((l, i, a) => l !== "" || i < a.length - 1);
+      const r = await runPython(src, inputs, "", b.files || {});
+      showConsole(node, r.output + (r.message ? (r.output ? "\n" : "") + r.message : ""), r.status !== "ok");
+      fb.textContent = r.status === "ok" ? "Program finished. Press Check to test it." : r.status === "timeout" ? r.message : "Your program stopped with an error: read the last line of the output.";
+    } else {
+      const t = T(b.id);
+      t.v = src; t.att++;
+      let failed = null, last = null;
+      for (const c of b.cases) {
+        const r = await runPython(src, c.inputs || [], c.check, c.files || b.files || {});
+        last = r;
+        if (r.status !== "ok") { failed = r; break; }
+      }
+      if (!failed) {
+        if (t.s !== "shown") t.s = "correct";
+        node.classList.add("is-correct"); node.classList.remove("is-shown");
+        fb.textContent = `All tests passed.`;
+        node.querySelector(".model-btn").hidden = true;
+        showConsole(node, last.output, false);
+      } else {
+        fb.textContent = failed.status === "fail" ? "Not yet: " + failed.message : failed.status === "timeout" ? failed.message : "Not yet: your program stopped with an error.";
+        showConsole(node, failed.output + (failed.status !== "fail" && failed.message ? (failed.output ? "\n" : "") + failed.message : ""), failed.status !== "fail");
+        if (t.att >= 2) node.querySelector(".model-btn").hidden = false;
+      }
+      save();
+    }
+  } catch (err) {
+    fb.textContent = "Python couldn't load. Check your internet connection, then press Run or Check again.";
+  }
+  btns.forEach((x) => (x.disabled = false));
+}
+
+// ---------- web tasks: live preview in a frame ----------
+function placeholderImage(name) {
+  let hue = 0;
+  for (const ch of name) hue = (hue * 31 + ch.charCodeAt(0)) % 360;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300"><rect width="600" height="300" fill="hsl(${hue},45%,55%)"/><text x="300" y="160" font-family="sans-serif" font-size="34" fill="white" text-anchor="middle">${name}</text></svg>`;
+  return "data:image/svg+xml;base64," + btoa(svg);
+}
+const webHelpers = { img: placeholderImage };
+function withImages(html) {
+  return html.replace(/(["'])(?:images|media)\/([\w-]+)\.(?:jpe?g|png|gif)\1/g, (m, q, name) => q + placeholderImage(name) + q);
+}
+function renderPreview(node, html) {
+  const frame = node.querySelector(".preview");
+  return new Promise((resolve) => {
+    frame.onload = () => setTimeout(resolve, 60);
+    const guard = `<script>document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a");if(a){e.preventDefault();}},true);document.addEventListener("submit",function(e){e.preventDefault();},true);<\/script>`;
+    let page = withImages(html);
+    page = /<head[^>]*>/i.test(page) ? page.replace(/<head[^>]*>/i, (m) => m + guard) : guard + page;
+    frame.srcdoc = page;
+  });
+}
+async function webCheck(b, node) {
+  const src = node.querySelector(".editor").value;
+  const fb = node.querySelector(".feedback");
+  const t = T(b.id);
+  t.v = src; t.att++;
+  await renderPreview(node, src);
+  const frame = node.querySelector(".preview");
+  let problem = null;
+  try {
+    const doc = frame.contentDocument, win = frame.contentWindow;
+    for (const check of b.checks) { problem = check(doc, win, webHelpers); if (problem) break; }
+  } catch (err) { problem = "Your page caused an error while it was being checked: " + err.message; }
+  if (!problem) {
+    if (t.s !== "shown") t.s = "correct";
+    node.classList.add("is-correct"); node.classList.remove("is-shown");
+    fb.textContent = "All checks passed.";
+    node.querySelector(".model-btn").hidden = true;
+  } else {
+    fb.textContent = "Not yet: " + problem;
+    if (t.att >= 2) node.querySelector(".model-btn").hidden = false;
+    renderPreview(node, src);
+  }
+  save();
+}
+
+// ---------- SQL tasks: an in-page SQLite database ----------
+const SQL_BASE = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/";
+let sqlReady = null;
+function loadSql() {
+  if (sqlReady) return sqlReady;
+  sqlReady = new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = SQL_BASE + "sql-wasm.js";
+    s.onload = () => window.initSqlJs({ locateFile: (f) => SQL_BASE + f }).then(resolve, reject);
+    s.onerror = () => reject(new Error("sql.js failed to load"));
+    document.head.appendChild(s);
+  });
+  sqlReady.catch(() => { sqlReady = null; });
+  return sqlReady;
+}
+function sqlLiteral(v) {
+  if (v === null) return "NULL";
+  if (typeof v === "number") return String(v);
+  if (typeof v === "boolean") return v ? "1" : "0";
+  return "'" + String(v).replace(/'/g, "''") + "'";
+}
+function freshDb(SQL) {
+  const db = new SQL.Database();
+  db.exec(DB.schema);
+  for (const [name, tb] of Object.entries(DB.tables)) {
+    for (const r of tb.rows) db.exec(`INSERT INTO ${name} (${tb.cols.join(", ")}) VALUES (${r.map(sqlLiteral).join(", ")});`);
+  }
+  return db;
+}
+function runSql(SQL, sql) {
+  const db = freshDb(SQL);
+  try {
+    const res = db.exec(sql);
+    const changed = db.getRowsModified();
+    return { ok: true, res, changed, db };
+  } catch (err) {
+    return { ok: false, error: err.message, db };
+  }
+}
+function tableHtml(r) {
+  if (!r) return "";
+  const body = r.values.slice(0, 200).map((row) => `<tr>${row.map((v) => `<td>${esc(v === null ? "NULL" : typeof v === "number" && !Number.isInteger(v) ? Math.round(v * 100) / 100 : v)}</td>`).join("")}</tr>`).join("");
+  return `<div class="trace-wrap"><table class="tbl result"><tr>${r.columns.map((c) => `<th>${esc(c)}</th>`).join("")}</tr>${body}</table></div><p class="small">${r.values.length} row${r.values.length === 1 ? "" : "s"}</p>`;
+}
+const normVal = (v) => (v === null ? "NULL" : typeof v === "number" ? String(Math.round(v * 100) / 100) : String(v).trim());
+function sameResult(a, b, ordered, names) {
+  if (!a || !b) return a === b ? null : "Your query returned no results table.";
+  if (a.columns.length !== b.columns.length) return `Your results have ${a.columns.length} column${a.columns.length === 1 ? "" : "s"}; the answer has ${b.columns.length}. Check which fields you SELECT.`;
+  if (names) for (let i = 0; i < b.columns.length; i++) if (a.columns[i].toLowerCase() !== b.columns[i].toLowerCase()) return `Column ${i + 1} should be called ${b.columns[i]}. Use AS to give it that name.`;
+  if (a.values.length !== b.values.length) return `Your query returned ${a.values.length} row${a.values.length === 1 ? "" : "s"}; the answer has ${b.values.length}. Check your WHERE conditions${ordered ? "" : " and GROUP BY"}.`;
+  const ra = a.values.map((r) => r.map(normVal).join("\u0001")), rb = b.values.map((r) => r.map(normVal).join("\u0001"));
+  if (ordered) { for (let i = 0; i < ra.length; i++) if (ra[i] !== rb[i]) return `Row ${i + 1} doesn't match. Check your ORDER BY${i === 0 ? " and the values you calculate" : ""}.`; return null; }
+  const sa = ra.slice().sort(), sb = rb.slice().sort();
+  for (let i = 0; i < sa.length; i++) if (sa[i] !== sb[i]) return "Your rows contain different values from the answer. Check your conditions and any calculations.";
+  return null;
+}
+async function sqlTask(b, node, mode) {
+  const src = node.querySelector(".editor").value;
+  const fb = node.querySelector(".feedback");
+  const out = node.querySelector(".sql-out");
+  fb.textContent = sqlReady ? "" : "Loading the database…";
+  let SQL;
+  try { SQL = await loadSql(); } catch (e) { fb.textContent = "The database couldn't load. Check your internet connection and try again."; return; }
+  const mine = runSql(SQL, src);
+  if (!mine.ok) { out.innerHTML = `<pre class="console err">${esc(mine.error)}</pre>`; fb.textContent = "Your SQL has an error: read the message above."; }
+  if (mode === "run") {
+    if (mine.ok) {
+      out.innerHTML = mine.res.length ? tableHtml(mine.res[mine.res.length - 1]) : `<p class="small">Statement ran. ${mine.changed} row${mine.changed === 1 ? "" : "s"} changed.</p>`;
+      if (b.verify && !mine.res.length) { const v = mine.db.exec(b.verify); out.innerHTML += `<p class="small">The table afterwards:</p>` + tableHtml(v[0]); }
+      fb.textContent = "Query ran. Press Check to test it.";
+    }
+    mine.db.close();
+    return;
+  }
+  const t = T(b.id);
+  t.v = src; t.att++;
+  let problem = null;
+  if (!mine.ok) problem = "Your SQL has an error.";
+  else {
+    const model = runSql(SQL, b.model);
+    if (b.verify) {
+      const mv = mine.db.exec(b.verify)[0], wv = model.db.exec(b.verify)[0];
+      problem = sameResult(mv, wv, true, false);
+      if (problem) problem = "The table isn't changed in the right way. Check your WHERE condition and the values you set.";
+      out.innerHTML = `<p class="small">The table after your statement:</p>` + tableHtml(mv);
+    } else {
+      const mr = mine.res[mine.res.length - 1], wr = model.res[model.res.length - 1];
+      out.innerHTML = tableHtml(mr);
+      problem = sameResult(mr, wr, !!b.ordered, !!b.names);
+      if (!problem && b.mustUse) for (const [re, msg] of b.mustUse) if (!re.test(src)) { problem = msg; break; }
+    }
+    model.db.close();
+  }
+  mine.db.close();
+  if (!problem) {
+    if (t.s !== "shown") t.s = "correct";
+    node.classList.add("is-correct"); node.classList.remove("is-shown");
+    fb.textContent = "Correct: your results match.";
+    node.querySelector(".model-btn").hidden = true;
+  } else {
+    fb.textContent = "Not yet: " + problem;
+    if (t.att >= 2) node.querySelector(".model-btn").hidden = false;
+  }
+  save();
+}
+
+// ---------- views ----------
+const $main = () => document.getElementById("main");
+function labelFor(b, prefix, counter) { return `${prefix} ${counter}`; }
+
+function renderChapter(ch) {
+  let n = 0;
+  const lab = () => `Try it ${ch.num}.${++n}`;
+  const p = progress(ch);
+  const rag = S.rag[ch.id] || [];
+  const idx = CHAPTERS.indexOf(ch);
+  let h = `<header class="ch-head"><p class="eyebrow">Chapter ${ch.num}</p><h2>${ch.title}</h2>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${p.total}" aria-valuenow="${p.done}"><span style="width:${(100 * p.done) / p.total}%"></span></div><p class="small">${p.done} of ${p.total} tasks done</p></header>
+    <div class="intentions"><h3>Learning intentions</h3><ul>${ch.intentions.map((i) => `<li>${i}</li>`).join("")}</ul></div>`;
+  if (ch.recall.length) {
+    h += `<div class="recall"><h3>Quick recall</h3><p class="small">Questions from earlier chapters, to keep them fresh.</p>`;
+    ch.recall.forEach((b, i) => { h += R[b.type](b, `Recall ${i + 1}`); });
+    h += `</div>`;
+  }
+  ch.blocks.forEach((b) => { h += R[b.type](b, ["text", "figure", "gen", "dbview"].includes(b.type) ? "" : lab()); });
+  h += `<div class="exam"><h3>Exam practice</h3><p class="small">Write a full answer, then mark it against the marking points.</p>`;
+  ch.exam.forEach((b, i) => { h += R[b.type](b, `Exam ${ch.num}.${i + 1}`); });
+  h += `</div><div class="rag"><h3>How confident are you?</h3>${ch.intentions.map((it, i) => `<div class="rag-row"><span>${it}</span><div class="rag-btns" role="group" aria-label="${esc(it)}">${["Not yet", "Getting there", "Confident"].map((l, j) => `<button type="button" class="rag-btn r${j} ${rag[i] === j ? "on" : ""}" data-i="${i}" data-j="${j}">${l}</button>`).join("")}</div></div>`).join("")}</div>
+    <nav class="pager">${idx > 0 ? `<a href="#${CHAPTERS[idx - 1].id}">← ${CHAPTERS[idx - 1].title}</a>` : `<a href="#home">← Overview</a>`}${idx < CHAPTERS.length - 1 ? `<a href="#${CHAPTERS[idx + 1].id}">${CHAPTERS[idx + 1].title} →</a>` : `<a href="#home">Overview →</a>`}</nav>`;
+  $main().innerHTML = h;
+  $main().querySelectorAll(".task.gen").forEach(newGen);
+  $main().querySelectorAll(".web-task").forEach((n) => renderPreview(n, n.querySelector(".editor").value));
+  bindChapter(ch);
+}
+
+function renderHome() {
+  const all = CHAPTERS.map(progress);
+  const done = all.reduce((a, p) => a + p.done, 0), total = all.reduce((a, p) => a + p.total, 0);
+  const next = CHAPTERS.find((c) => { const p = progress(c); return p.done < p.total; }) || CHAPTERS[0];
+  $main().innerHTML = `<header class="hero"><p class="eyebrow">Higher Computing Science</p><h2>${BOOK.short} workbook</h2>
+    <p class="lede">Learn a little, try it straight away, get instant feedback. Every chapter starts with quick recall from earlier chapters and ends with exam practice and a confidence check.</p>
+    <div class="hero-stats"><div><b>${done}</b><span>of ${total} tasks done</span></div><a class="primary big" href="#${next.id}">${done ? "Continue" : "Start"}: ${next.title}</a></div></header>
+    <div class="cards">${CHAPTERS.map((c, i) => { const p = all[i]; const rag = S.rag[c.id] || []; const conf = rag.filter((x) => x === 2).length; return `<a class="card ${p.done === p.total ? "complete" : ""}" href="#${c.id}"><span class="num">${c.num}</span><span class="ct">${c.title}</span><span class="bar"><span style="width:${(100 * p.done) / p.total}%"></span></span><span class="small">${p.done}/${p.total} tasks${conf ? ` · ${conf}/${c.intentions.length} confident` : ""}</span></a>`; }).join("")}</div>
+    <div class="howto"><h3>How it works</h3><ul><li><b>Try it</b> tasks check your answer instantly. After two tries you can see the answer.</li>${BOOK.howto.map((h) => `<li>${h}</li>`).join("")}<li><b>Practice machines</b> make a new question every time, so you can practise as much as you like.</li><li><b>Exam practice</b>: write your answer, then tick the marking points it makes.</li></ul>
+    <h3>Keeping your progress</h3><p>This browser remembers your work, but only on this device, and a shared school computer may forget it when you log off. At the end of each lesson, <b>download your progress file</b> and keep it in your OneDrive or Google Drive. Next time, on any device, <b>load</b> it to carry on where you left off.</p>
+    <div class="save-row"><button type="button" class="primary home-save">Download my progress</button><button type="button" class="ghost home-load">Load my progress</button></div>
+    <p class="small">${S.savedAt ? `Last downloaded: ${new Date(S.savedAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}.` : "You haven't downloaded a progress file yet."} <button type="button" class="link reset-btn">Reset my progress</button></p><div class="confirm" hidden><p>Clear every answer and start again?</p><button type="button" class="primary danger yes-reset">Yes, clear it</button><button type="button" class="ghost no-reset">Keep my progress</button></div></div>`;
+  $main().querySelector(".home-save").onclick = () => document.getElementById("save-btn").click();
+  $main().querySelector(".home-load").onclick = () => document.getElementById("load-file").click();
+  $main().querySelector(".reset-btn").onclick = () => { $main().querySelector(".confirm").hidden = false; };
+  $main().querySelector(".no-reset").onclick = () => { $main().querySelector(".confirm").hidden = true; };
+  $main().querySelector(".yes-reset").onclick = () => { S = { tasks: {}, rag: {} }; save(); route(); };
+}
+
+function renderNav(active) {
+  document.getElementById("nav").innerHTML = `<a href="#home" class="${active === "home" ? "on" : ""}"><span class="num">·</span>Overview</a>` + CHAPTERS.map((c) => { const p = progress(c); return `<a href="#${c.id}" class="${active === c.id ? "on" : ""} ${p.done === p.total ? "complete" : ""}"><span class="num">${c.num}</span><span class="nt">${c.title}</span><span class="mini">${p.done}/${p.total}</span></a>`; }).join("");
+}
+
+function refreshProgress(ch) {
+  const p = progress(ch);
+  const head = $main().querySelector(".ch-head");
+  if (head) { head.querySelector(".bar span").style.width = (100 * p.done) / p.total + "%"; head.querySelector(".small").textContent = `${p.done} of ${p.total} tasks done`; }
+  renderNav(ch.id);
+}
+
+function bindChapter(ch) {
+  const all = [...ch.recall, ...ch.blocks, ...ch.exam];
+  const byId = Object.fromEntries(all.filter((b) => b.id).map((b) => [b.id, b]));
+  const m = $main();
+  m.onclick = (e) => {
+    const bit = e.target.closest(".bit");
+    if (bit) { bit.textContent = bit.textContent === "1" ? "0" : "1"; bit.classList.remove("wrong"); return; }
+    const gnode = e.target.closest(".task.gen");
+    if (gnode) {
+      if (e.target.closest(".gen-new")) newGen(gnode);
+      else if (e.target.closest(".gen-check")) checkGen(gnode);
+      else if (e.target.closest(".gen-show")) showGen(gnode);
+      return;
+    }
+    const rb = e.target.closest(".rag-btn");
+    if (rb) { const r = (S.rag[ch.id] = S.rag[ch.id] || []); r[Number(rb.dataset.i)] = Number(rb.dataset.j); save(); rb.parentNode.querySelectorAll(".rag-btn").forEach((x) => x.classList.toggle("on", x === rb)); return; }
+    const node = e.target.closest(".task[data-id]");
+    if (!node) return;
+    const b = byId[node.dataset.id];
+    const t = T(b.id);
+    const fb = node.querySelector(".feedback");
+    if (b.type === "code" || b.type === "web" || b.type === "sql") {
+      const run = b.type === "code" ? (m) => codeRun(b, node, m) : b.type === "sql" ? (m) => sqlTask(b, node, m) : (m) => (m === "run" ? renderPreview(node, node.querySelector(".editor").value) : webCheck(b, node));
+      if (e.target.closest(".run-btn")) run("run");
+      else if (e.target.closest(".code-check")) Promise.resolve(run("check")).then(() => refreshProgress(ch));
+      else if (e.target.closest(".reset-code")) { node.querySelector(".editor").value = b.starter || ""; t.v = b.starter || ""; save(); if (b.type === "web") renderPreview(node, t.v); }
+      else if (e.target.closest(".model-btn")) { node.querySelector(".model").hidden = false; if (t.s !== "correct") { t.s = "shown"; node.classList.add("is-shown"); } save(); refreshProgress(ch); }
+      return;
+    }
+    if (e.target.closest(".hint-btn")) { const hn = node.querySelector(".hint"); hn.hidden = !hn.hidden; return; }
+    if (e.target.closest(".show-btn")) { revealAnswer(b, node); if (t.s !== "correct") t.s = "shown"; node.className = "task is-shown"; fb.textContent = "Answer shown. Try the next one on your own."; save(); refreshProgress(ch); return; }
+    if (e.target.closest(".mark-btn")) {
+      const pts = node.querySelector(".points");
+      t.v = node.querySelector("textarea").value;
+      if (pts.hidden) { pts.hidden = false; t.s = "marked"; t.ticks = t.ticks || []; node.classList.add("is-marked"); e.target.textContent = "Hide marking points"; pts.querySelector(".score").textContent = `You gave yourself ${t.ticks.length} of ${b.marks}.`; }
+      else { pts.hidden = true; e.target.textContent = "Mark my answer"; }
+      save(); refreshProgress(ch); return;
+    }
+    const opt = e.target.closest(".opt");
+    if (opt && b.type === "multi") { opt.classList.toggle("picked"); opt.setAttribute("aria-pressed", opt.classList.contains("picked")); return; }
+    if (opt && b.type === "choice") {
+      node.querySelectorAll(".opt").forEach((x) => x.classList.toggle("picked", x === opt));
+      t.v = Number(opt.dataset.i); t.att++;
+      if (t.v === b.correct) { t.s = t.s === "shown" ? "shown" : "correct"; node.className = "task is-correct"; fb.textContent = "Correct."; }
+      else { fb.textContent = "Not yet. Try another option."; if (t.att >= 2) node.querySelector(".show-btn").hidden = false; }
+      save(); refreshProgress(ch); return;
+    }
+    if (e.target.closest(".check-btn")) {
+      const r = evaluate(b, node);
+      t.v = r.v; t.att++;
+      if (r.ok) { if (t.s !== "shown") t.s = "correct"; node.className = "task is-correct"; fb.textContent = "Correct."; node.querySelector(".show-btn").hidden = true; }
+      else { fb.textContent = b.type === "bits" || b.type === "fp" ? "Not yet. The red bits are wrong; try again." : "Not yet. Check the highlighted answers and try again."; if (t.att >= 2) node.querySelector(".show-btn").hidden = false; }
+      save(); refreshProgress(ch);
+    }
+  };
+  m.onchange = (e) => {
+    const cb = e.target.closest(".point input");
+    if (!cb) return;
+    const node = e.target.closest(".task[data-id]"); const b = byId[node.dataset.id]; const t = T(b.id);
+    t.ticks = [...node.querySelectorAll(".point input")].map((x, i) => (x.checked ? i : -1)).filter((i) => i >= 0);
+    node.querySelector(".score").textContent = `You gave yourself ${t.ticks.length} of ${b.marks}.`;
+    save();
+  };
+  m.oninput = (e) => {
+    const ta = e.target.closest("textarea");
+    if (!ta) return;
+    const t = T(ta.closest(".task").dataset.id);
+    if (ta.classList.contains("stdin")) t.stdin = ta.value; else t.v = ta.value;
+    save();
+  };
+  m.onkeydown = (e) => {
+    const ed = e.target.closest("textarea.editor");
+    if (ed && e.key === "Escape") { ed.dataset.leave = "1"; return; }
+    if (ed && e.key === "Tab" && ed.dataset.leave === "1") { delete ed.dataset.leave; return; }
+    if (ed && (e.key === "Tab" || e.key === "Enter") && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      delete ed.dataset.leave;
+      const { selectionStart: a, selectionEnd: z, value } = ed;
+      let insert;
+      if (e.key === "Tab") {
+        if (e.shiftKey) return;
+        insert = "    ";
+      } else {
+        const lineStart = value.lastIndexOf("\n", a - 1) + 1;
+        const line = value.slice(lineStart, a);
+        const indent = line.match(/^ */)[0];
+        insert = "\n" + indent + (/:\s*$/.test(line) ? "    " : "");
+      }
+      e.preventDefault();
+      ed.value = value.slice(0, a) + insert + value.slice(z);
+      ed.selectionStart = ed.selectionEnd = a + insert.length;
+      ed.dispatchEvent(new Event("input", { bubbles: true }));
+      return;
+    }
+    if (e.key === "Enter" && e.target.matches("input[type=text]")) { const n = e.target.closest(".task"); const btn = n && (n.querySelector(".check-btn") || n.querySelector(".gen-check")); if (btn) btn.click(); }
+  };
+}
+
+// ---------- progress file ----------
+const FILE_TAG = BOOK.tag;
+function countDone(state) {
+  return CHAPTERS.reduce((a, ch) => a + countable(ch).filter((b) => { const t = state.tasks[b.id]; return t && ["correct", "shown", "marked"].includes(t.s); }).length, 0);
+}
+const totalTasks = () => CHAPTERS.reduce((a, ch) => a + countable(ch).length, 0);
+function setStatus(msg) { document.getElementById("save-status").textContent = msg; }
+
+// Inside Claude, downloads go through the platform; on a self-hosted page, through an ordinary link.
+let claudeDownloads = null;
+try {
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("downloads").then((d) => { claudeDownloads = d; }).catch(() => { claudeDownloads = null; });
+  }
+} catch (e) { claudeDownloads = null; }
+
+document.getElementById("save-btn").onclick = async () => {
+  const savedAt = new Date().toISOString();
+  const data = JSON.stringify({ app: FILE_TAG, version: 1, savedAt, progress: Object.assign({}, S, { savedAt }) }, null, 1);
+  const filename = `${BOOK.file}-progress-${savedAt.slice(0, 10)}.json`;
+  const done = () => { S.savedAt = savedAt; save(); setStatus(`Saved ${countDone(S)} of ${totalTasks()} tasks to ${filename}. Keep it in your OneDrive or Google Drive.`); if (!location.hash || location.hash === "#home") route(); };
+  if (claudeDownloads) {
+    try { await claudeDownloads.save({ filename, data }); done(); }
+    catch (err) {
+      const code = err && err.code;
+      if (code === "declined") setStatus("Download cancelled. Nothing was saved.");
+      else if (code === "rate_limited") setStatus("A save is already waiting for you to confirm. Try again in a moment.");
+      else setStatus("Downloads aren't available in this view. Open the workbook from your school's link to save a file.");
+    }
+    return;
+  }
+  try {
+    const url = URL.createObjectURL(new Blob([data], { type: "application/json" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    done();
+  } catch (e) {
+    setStatus("This browser blocked the download. Try another browser, or ask your teacher.");
+  }
+};
+
+let pending = null;
+document.getElementById("load-file").onchange = (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const d = JSON.parse(reader.result);
+      if (d.app !== FILE_TAG || !d.progress || typeof d.progress.tasks !== "object") throw new Error("not ours");
+      pending = { tasks: d.progress.tasks || {}, rag: d.progress.rag || {}, savedAt: d.progress.savedAt };
+      const when = d.savedAt ? new Date(d.savedAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : "an unknown date";
+      document.getElementById("load-summary").textContent = `This file was saved on ${when} and has ${countDone(pending)} of ${totalTasks()} tasks done. You have ${countDone(S)} done here.`;
+      document.getElementById("load-confirm").hidden = false;
+      setStatus("");
+    } catch (err) {
+      setStatus(`That file isn't a ${BOOK.short} progress file. Choose the .json file you downloaded from this workbook.`);
+    }
+  };
+  reader.onerror = () => setStatus("The file couldn't be read. Try choosing it again.");
+  reader.readAsText(file);
+};
+document.getElementById("load-yes").onclick = () => {
+  if (!pending) return;
+  S = pending; pending = null; save();
+  document.getElementById("load-confirm").hidden = true;
+  setStatus(`Progress loaded: ${countDone(S)} of ${totalTasks()} tasks done.`);
+  route();
+};
+document.getElementById("load-no").onclick = () => { pending = null; document.getElementById("load-confirm").hidden = true; setStatus("Nothing changed."); };
+
+function route() {
+  const id = location.hash.replace("#", "");
+  const ch = CHAPTERS.find((c) => c.id === id);
+  renderNav(ch ? ch.id : "home");
+  if (ch) renderChapter(ch); else renderHome();
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+route();
+
+</script>
+</body>
+</html>

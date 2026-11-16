@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web Design and Development Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Plan: one study app per Higher unit, each in its textbook's colour; left rail of chapters, one readable column of learn-then-try blocks with in-page Python, web preview or SQL. */
+:root {
+  --bg: #ffffff;
+  --surface: #f3f0fb;
+  --surface-2: #e6e0f6;
+  --ink: #1d1438;
+  --muted: #5c5378;
+  --line: #ddd6ef;
+  --accent: #6a4bb5;
+  --accent-ink: #ffffff;
+  --info: #2f6fb3;
+  --good: #2e7d4f;
+  --good-bg: #e6f3eb;
+  --bad: #c0392b;
+  --bad-bg: #fbe9e6;
+  --warn: #b7791f;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #120e1f; --surface: #1c1630; --surface-2: #272041; --ink: #efeafb; --muted: #b3a9d1; --line: #3a3159;
+    --accent: #a58cf0; --accent-ink: #140d2b; --info: #7fb2ea; --good: #6fcf97; --good-bg: #1d3326; --bad: #f08a7c; --bad-bg: #3a1f1a; --warn: #e3b25c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #120e1f; --surface: #1c1630; --surface-2: #272041; --ink: #efeafb; --muted: #b3a9d1; --line: #3a3159;
+  --accent: #a58cf0; --accent-ink: #140d2b; --info: #7fb2ea; --good: #6fcf97; --good-bg: #1d3326; --bad: #f08a7c; --bad-bg: #3a1f1a; --warn: #e3b25c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 17px/1.55 var(--font-body); }
+.layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); min-height: 100vh; }
+aside { background: var(--surface); border-right: 1px solid var(--line); padding: 22px 14px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 19px; line-height: 1.15; padding: 0 10px 16px; }
+.brand small { display: block; font: 700 11px/1.4 var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+#nav { display: flex; flex-direction: column; gap: 2px; }
+#nav a { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; color: var(--ink); text-decoration: none; font-size: 14.5px; line-height: 1.3; }
+#nav a:hover { background: var(--surface-2); }
+#nav a.on { background: var(--accent); color: var(--accent-ink); }
+#nav .num { font: 700 13px var(--font-mono); text-align: center; }
+#nav .mini { font: 500 11.5px var(--font-mono); opacity: .75; }
+#nav a.complete .mini { color: var(--good); opacity: 1; }
+#nav a.on.complete .mini { color: inherit; }
+main { padding: 36px clamp(16px, 4vw, 56px) 80px; max-width: 860px; }
+h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 4vw, 38px); line-height: 1.1; margin: 0 0 14px; text-wrap: balance; }
+h3 { font-family: var(--font-display); font-weight: 600; font-size: 21px; margin: 0 0 8px; text-wrap: balance; }
+.eyebrow { font-weight: 700; font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+.small { font-size: 14px; color: var(--muted); margin: 6px 0 0; }
+.mono, .code, .bit, .pv span { font-family: var(--font-mono); }
+.bar { display: block; height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .3s; }
+.ch-head { margin-bottom: 22px; }
+.intentions, .recall, .exam, .rag, .howto { background: var(--surface); border-radius: 14px; padding: 18px 20px; margin: 22px 0; }
+.intentions ul { margin: 0; padding-left: 20px; }
+.recall { border: 2px dashed var(--line); background: transparent; }
+.exam { background: var(--surface-2); }
+.prose { margin: 26px 0 10px; }
+.prose p { margin: 8px 0; max-width: 68ch; }
+.prose ol, .prose ul { padding-left: 22px; }
+.pv { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+.pv span { min-width: 44px; padding: 6px 4px; text-align: center; background: var(--ink); color: var(--bg); border-radius: 6px; font-weight: 700; font-size: 14px; }
+.pv span.neg { background: var(--accent); color: var(--accent-ink); }
+.pv span.pt { background: transparent; color: var(--ink); min-width: 14px; }
+.code { background: var(--surface); padding: 12px 14px; border-radius: 8px; overflow-x: auto; font-size: 14px; }
+.tbl { border-collapse: collapse; margin: 10px 0; font-size: 15.5px; }
+.tbl th, .tbl td { text-align: left; padding: 7px 14px 7px 0; border-bottom: 1px solid var(--line); }
+.tbl th { color: var(--muted); font-weight: 700; }
+.fig { margin: 22px 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; }
+.fig svg { width: 100%; min-width: 520px; height: auto; display: block; }
+
+.task { border: 1.5px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; background: var(--bg); transition: border-color .2s, background .2s; }
+.task.is-correct { border-color: var(--good); background: var(--good-bg); }
+.task.is-shown { border-color: var(--warn); }
+.task.is-marked { border-color: var(--info); }
+.task-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
+.tag { font: 700 12px var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.gen-tag { color: var(--info); }
+.marks, .streak { font-size: 13px; color: var(--muted); }
+.task.gen { border-style: dashed; border-color: var(--info); }
+.q { margin: 0 0 10px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+button { font: inherit; cursor: pointer; }
+.primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 9px; padding: 8px 18px; font-weight: 700; text-decoration: none; display: inline-block; }
+.primary.big { padding: 12px 22px; font-size: 17px; }
+.primary.danger { background: var(--bad); color: #fff; }
+.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 9px; padding: 7px 14px; }
+.ghost:hover { border-color: var(--muted); }
+.link { background: none; border: 0; padding: 0; color: var(--info); text-decoration: underline; font-size: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--info); outline-offset: 2px; }
+.feedback { margin-top: 10px; font-weight: 700; min-height: 1em; }
+.is-correct .feedback { color: var(--good); }
+.hint { margin-top: 10px; padding: 10px 12px; background: var(--surface); border-radius: 8px; font-size: 15.5px; }
+input[type=text], textarea, select { font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+.answer-row input { width: min(240px, 100%); font-family: var(--font-mono); }
+textarea { width: 100%; resize: vertical; }
+input.gap { padding: 3px 6px; font-family: var(--font-mono); margin: 0 2px; }
+.wrong { border-color: var(--bad) !important; background: var(--bad-bg) !important; }
+.gap-text { line-height: 2.2; margin: 0; }
+.bits { display: inline-block; overflow-x: auto; max-width: 100%; }
+.bitrow { display: flex; gap: 5px; }
+.bitrow.places { margin-bottom: 5px; }
+.bitrow.places span { width: 46px; text-align: center; font: 700 13px var(--font-mono); color: var(--muted); }
+.bit { width: 46px; height: 46px; border: 2px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); font-size: 20px; font-weight: 700; padding: 0; }
+.bit:hover { border-color: var(--accent); }
+.bit.wrong { color: var(--bad); }
+.is-correct .bit { border-color: var(--good); }
+.fp { display: flex; flex-wrap: wrap; gap: 14px; }
+.fp .bit { width: 30px; height: 38px; font-size: 16px; }
+.fp .bitrow { gap: 3px; flex-wrap: wrap; }
+.fp-label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt { background: var(--surface); color: var(--ink); border: 1.5px solid var(--line); border-radius: 9px; padding: 8px 14px; text-align: left; }
+.opt.picked { border-color: var(--accent); background: var(--surface-2); font-weight: 700; }
+.match { display: grid; gap: 8px; }
+.match-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(170px, 300px); gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.match-row select { width: 100%; }
+.points { margin-top: 12px; }
+.point { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; }
+.point input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--accent); }
+.score { font-weight: 700; color: var(--info); }
+.rag-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.rag-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.rag-btn { border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 99px; padding: 5px 12px; font-size: 14px; }
+.rag-btn.r0.on { background: var(--bad); border-color: var(--bad); color: #fff; }
+.rag-btn.r1.on { background: var(--warn); border-color: var(--warn); color: #fff; }
+.rag-btn.r2.on { background: var(--good); border-color: var(--good); color: #fff; }
+.pager { display: flex; justify-content: space-between; gap: 16px; margin-top: 30px; flex-wrap: wrap; }
+.pager a { color: var(--accent); font-weight: 700; text-decoration: none; }
+.hero { padding: 10px 0 8px; }
+.lede { font-size: 19px; max-width: 60ch; color: var(--muted); }
+.hero-stats { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; margin: 18px 0 8px; }
+.hero-stats b { font: 800 40px var(--font-display); display: block; line-height: 1; }
+.hero-stats span { font-size: 14px; color: var(--muted); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 22px 0; }
+.card { display: grid; gap: 8px; padding: 16px; border-radius: 14px; background: var(--surface); color: var(--ink); text-decoration: none; border: 1.5px solid transparent; }
+.card:hover { border-color: var(--accent); }
+.card .num { font: 700 13px var(--font-mono); color: var(--accent); }
+.card .ct { font-weight: 700; line-height: 1.3; min-height: 2.6em; }
+.card.complete .bar span { background: var(--good); }
+.confirm { margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.confirm[hidden] { display: none; }
+.confirm p { margin: 0; font-weight: 700; }
+.savebox { margin: 22px 4px 0; padding: 14px 12px; border-top: 1px solid var(--line); display: grid; gap: 8px; }
+.save-title { margin: 0; font-weight: 700; font-size: 14px; }
+.savebox .ghost, .load-label { font-size: 14px; text-align: center; padding: 7px 10px; background: var(--bg); cursor: pointer; display: block; }
+.save-status { margin: 0; }
+.load-confirm { display: grid; gap: 6px; font-size: 14px; }
+.load-confirm[hidden] { display: none; }
+.load-confirm p { margin: 0; }
+.howto .save-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.editor { width: 100%; font: 14.5px/1.5 var(--font-mono); background: var(--surface); color: var(--ink); border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; tab-size: 4; white-space: pre; overflow-x: auto; resize: vertical; margin-top: 4px; }
+.editor:focus { border-color: var(--accent); }
+.stdin-label { display: grid; gap: 4px; margin-top: 10px; }
+.stdin { font: 14px/1.4 var(--font-mono); width: min(360px, 100%); }
+.console { background: #120e1f; color: #d8f3e8; font: 14px/1.5 var(--font-mono); padding: 12px 14px; border-radius: 10px; white-space: pre-wrap; margin: 12px 0 0; max-height: 320px; overflow: auto; }
+.console.err { color: #ffd0c8; }
+.higher-note { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--warn) 14%, var(--bg)); border: 1px solid var(--warn); font-size: 15px; }
+.higher-note ul { margin: 6px 0 0; padding-left: 20px; }
+.model { margin-top: 12px; }
+.files { margin: 6px 0 10px; font-size: 15px; }
+.files summary { cursor: pointer; color: var(--info); }
+.files pre { max-height: 200px; overflow: auto; }
+.mono-line { font-family: var(--font-mono); white-space: pre; font-size: 14.5px; overflow-x: auto; }
+.trace-wrap { overflow-x: auto; }
+.trace td, .trace th { padding: 6px 12px; border: 1px solid var(--line); }
+.prose pre.code, .q pre.code { white-space: pre; }
+button:disabled { opacity: .55; cursor: progress; }
+.back { display: block; font-size: 13.5px; color: var(--muted); text-decoration: none; padding: 0 10px 12px; }
+.back:hover { color: var(--accent); }
+.web-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.preview-wrap .small { margin: 0 0 4px; }
+.preview { width: 100%; height: 360px; border: 1.5px solid var(--line); border-radius: 10px; background: #fff; }
+.sql-out { margin-top: 12px; }
+.result td, .result th { border: 1px solid var(--line); padding: 5px 10px; font-size: 14.5px; }
+.result th { background: var(--surface); }
+.dbview { margin: 16px 0; background: var(--surface); border-radius: 12px; padding: 12px 16px; }
+.dbview summary { cursor: pointer; font-weight: 700; color: var(--accent); }
+.dbview h4 { margin: 14px 0 4px; }
+@media (max-width: 820px) {
+  .savebox { grid-template-columns: 1fr 1fr; margin: 10px 0 0; padding: 10px 0 0; }
+  .save-title, .save-status, .load-confirm { grid-column: 1 / -1; }
+  .layout { grid-template-columns: 1fr; }
+  aside { position: static; height: auto; padding: 12px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .brand { padding-bottom: 8px; }
+  #nav { flex-direction: row; overflow-x: auto; gap: 4px; }
+  #nav a { grid-template-columns: auto; white-space: nowrap; }
+  #nav .nt, #nav .mini { display: none; }
+  .match-row, .rag-row { grid-template-columns: 1fr; }
+  .bit { width: 34px; height: 40px; font-size: 17px; }
+  .bitrow.places span { width: 34px; font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside><a class="back" href="index.html">← All workbooks</a><div class="brand"><small>Higher Computing Science</small>Web Design and Development workbook</div><nav id="nav" aria-label="Chapters"></nav>
+    <div class="savebox" id="savebox">
+      <p class="save-title">My progress file</p>
+      <button type="button" class="ghost save-btn" id="save-btn">Download my progress</button>
+      <label class="ghost load-label" for="load-file">Load my progress</label>
+      <input type="file" id="load-file" accept=".json,application/json" hidden>
+      <p class="save-status small" id="save-status" aria-live="polite"></p>
+      <div class="load-confirm" id="load-confirm" hidden><p id="load-summary"></p><button type="button" class="primary" id="load-yes">Replace my progress</button><button type="button" class="ghost" id="load-no">Cancel</button></div>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+<script>
+// ---------- pure logic (tested in node) ----------
+function toTwos(n, bits) {
+  if (n < 0) n = n + 2 ** bits;
+  let s = "";
+  for (let i = 0; i < bits; i++) { s = (n % 2) + s; n = Math.floor(n / 2); }
+  return s;
+}
+function toBinary(n, bits) { return toTwos(n, bits); }
+function fromTwos(b) {
+  let v = 0;
+  const n = b.length;
+  for (let i = 0; i < n; i++) {
+    let p = 2 ** (n - 1 - i);
+    if (i === 0) p = -p;
+    if (b[i] === "1") v += p;
+  }
+  return v;
+}
+function fpEncode(x, m = 15, e = 8) {
+  const sign = x < 0 ? "1" : "0";
+  x = Math.abs(x);
+  let exp = 0;
+  while (x >= 1) { x /= 2; exp++; }
+  while (x > 0 && x < 0.5) { x *= 2; exp--; }
+  let mant = "";
+  for (let i = 0; i < m; i++) { x *= 2; const d = Math.floor(x); mant += d; x -= d; }
+  return { sign, mantissa: mant, exponent: toTwos(exp, e), exp };
+}
+function fpDecode(sign, mant, expBits) {
+  const e = fromTwos(expBits);
+  let m = 0;
+  for (let i = 0; i < mant.length; i++) if (mant[i] === "1") m += 2 ** -(i + 1);
+  return (sign === "1" ? -1 : 1) * m * 2 ** e;
+}
+function sameNumber(input, answer) {
+  const clean = String(input).replace(/[\s,£]/g, "").replace(/bytes?$/i, "").replace(/−/g, "-");
+  if (clean === "") return false;
+  const v = Number(clean);
+  return !Number.isNaN(v) && Math.abs(v - Number(answer)) < 1e-9;
+}
+function sameText(input, accepted) {
+  const norm = (t) => String(t).toLowerCase().replace(/[^a-z0-9.\-]/g, "");
+  return accepted.some((a) => norm(a) === norm(input));
+}
+function mulberry(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, seedText) {
+  let seed = 0;
+  for (const ch of seedText) seed = (seed * 31 + ch.charCodeAt(0)) | 0;
+  const r = mulberry(seed);
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  if (a.every((v, i) => v === arr[i]) && a.length > 1) a.push(a.shift());
+  return a;
+}
+if (false) module.exports = { toTwos, fromTwos, fpEncode, fpDecode, sameNumber, sameText, seededShuffle };
+
+const BOOK = { key: "wdd-higher-workbook-v1", tag: "wdd-workbook", file: "wdd", short: "Web Design and Development",
+  howto: ["<b>Web tasks</b>: write HTML, CSS or JavaScript and see your page in the preview beside it. <b>Check</b> tests the page you made. Images show as coloured placeholders."] };
+
+const css = (win, el, prop) => win.getComputedStyle(el).getPropertyValue(prop);
+const styleText = (doc) => [...doc.querySelectorAll("style")].map((s) => s.textContent).join("\n");
+const hoverRules = (doc) => { const out = []; for (const sh of doc.styleSheets) { try { for (const r of sh.cssRules) if (r.selectorText && /:hover/.test(r.selectorText)) out.push(r); } catch (e) { /* ignore */ } } return out; };
+
+const PAGE_HEAD = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Glenmore Outdoor Centre</title>`;
+
+const SITE_BODY = `    <header>
+        <h1>Glenmore Outdoor Centre</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="activities.html">Activities</a></li>
+            <li><a href="accommodation.html">Accommodation</a></li>
+            <li><a href="booking.html">Booking</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section class="activity">
+            <img src="images/kayak.jpg" alt="Kayaking">
+            <h3>Kayaking</h3>
+            <p>Paddle Loch Morlich with a qualified instructor.</p>
+        </section>
+        <section class="activity">
+            <img src="images/climb.jpg" alt="Climbing">
+            <h3>Climbing</h3>
+            <p>Indoor wall and outdoor crags for all levels.</p>
+        </section>
+        <section class="activity">
+            <img src="images/bike.jpg" alt="Mountain biking">
+            <h3>Mountain biking</h3>
+            <p>Forest trails for beginners and experts.</p>
+        </section>
+    </main>
+    <footer>
+        <p>Glenmore, Aviemore PH22 1QU</p>
+    </footer>`;
+
+const CHAPTERS = [
+{
+  id: "analysis", num: 1, title: "Analysis",
+  intentions: ["I can identify end-user requirements", "I can identify functional requirements"],
+  recall: [],
+  blocks: [
+    { type: "text", html: `<h3>The running case study</h3><p><b>Glenmore Outdoor Centre</b> runs kayaking, climbing and mountain biking courses. The manager wants a website for families and school groups: information on each activity with photos and video, accommodation details, and a booking enquiry form (name, email, number of people from 1 to 12, activity). It must work on phones as well as computers.</p>
+      <h3>Two kinds of requirement</h3><ul><li><b>End-user requirements</b> describe what the <b>people using the site</b> want to be able to do, from their point of view.</li><li><b>Functional requirements</b> describe what the <b>website must do</b> to meet them: its pages, features and processes. Each must be testable.</li></ul>` },
+    { type: "match", id: "1a", q: "End-user or functional requirement?", options: ["End-user", "Functional"], items: [["A parent wants to compare the three activities", 0], ["There is one page for each activity, with text, a photo and a video", 1], ["A visitor wants to send a booking enquiry without phoning", 0], ["The form checks that the number of people is from 1 to 12", 1], ["A teacher wants to find out about group accommodation", 0], ["Every page has the same navigation bar", 1]] },
+    { type: "choice", id: "1b", q: "Which functional requirement meets the end-user requirement <i>“I want to find the climbing information quickly”</i>?", options: ["The site uses a pleasant colour scheme", "A navigation bar links to the Activities page, which links to Climbing", "The site has a contact phone number"], correct: 1 },
+  ],
+  exam: [
+    { type: "written", id: "1x", q: "A bakery wants a website where customers can view cakes, read reviews and order a birthday cake for collection. State one end-user requirement and one functional requirement.", marks: 2, points: ["End-user: e.g. a customer wants to see photos of cakes before ordering", "Functional: e.g. an order form collects name, cake type and collection date"] },
+  ],
+},
+{
+  id: "design", num: 2, title: "Design",
+  intentions: ["I can draw a multi-level site structure", "I can describe what a wireframe shows", "I can explain the use of a low-fidelity prototype"],
+  recall: [ { type: "choice", id: "2r1", q: "Recall: “The form checks the email is present” is…", options: ["an end-user requirement", "a functional requirement"], correct: 1 } ],
+  blocks: [
+    { type: "text", html: `<h3>Site structure</h3><p>A Higher site structure has a <b>home page and two further levels</b>, with <b>no more than four pages on any level</b>.</p><pre class="code">Level 1:            Home
+Level 2:   Activities   Accommodation   Booking
+Level 3:   Kayaking   Climbing   Mountain biking   (under Activities)</pre>` },
+    { type: "choice", id: "2a", q: "A site has Home, then five level 2 pages. Does this meet the Higher rules?", options: ["Yes", "No: there can be no more than four pages on a level", "No: there must be exactly three levels"], correct: 1 },
+    { type: "text", html: `<h3>Wireframes</h3><p>A wireframe sketches one page's layout. It shows the navigation bar, the position of text, images, video and audio, form inputs and their types, media file formats, interactive elements, and how the page suits the device.</p><h3>Low-fidelity prototypes</h3><p>A quick paper model of the site, one sheet per page, used for usability testing before any code is written, so problems are cheap to fix.</p>` },
+    { type: "multi", id: "2b", q: "Select everything a Higher wireframe should show.", options: ["The navigation bar", "Exact hex colour codes", "Form inputs and their types", "Media file formats, such as JPEG or MP4", "The final wording of every paragraph", "Interactive elements, such as an image swap"], correct: [0, 2, 3, 5] },
+  ],
+  exam: [
+    { type: "written", id: "2x", q: "Explain one benefit of creating a low-fidelity prototype before implementing a website.", marks: 1, points: ["Users can test layout and navigation, and problems can be fixed quickly and cheaply before time is spent coding"] },
+  ],
+},
+{
+  id: "html", num: 3, title: "HTML structure",
+  intentions: ["I can build a page with header, nav, main, section and footer", "I can use id and class attributes"],
+  recall: [ { type: "num", id: "3r1", q: "Recall: what is the most pages allowed on one level of a Higher site structure?", answer: 4 } ],
+  blocks: [
+    { type: "text", html: `<h3>Structural elements</h3><table class="tbl"><tr><th>Element</th><th>Purpose</th></tr><tr><td>header</td><td>Banner at the top: site name or logo</td></tr><tr><td>nav</td><td>The navigation bar: a list of links</td></tr><tr><td>main</td><td>Content unique to this page</td></tr><tr><td>section</td><td>A themed group of content within main</td></tr><tr><td>footer</td><td>Bottom of the page: contact details</td></tr></table><p>An <b>id</b> names one element; a <b>class</b> names a group that share a style.</p>` },
+    { type: "web", id: "3a", q: "Complete the page: add a <span class='mono'>header</span> with an h1, a <span class='mono'>nav</span> holding an unordered list of four links (Home, Activities, Accommodation, Booking), a <span class='mono'>main</span> with at least two <span class='mono'>section</span> elements, and a <span class='mono'>footer</span>.",
+      starter: PAGE_HEAD + `
+</head>
+<body>
+
+</body>
+</html>
+`,
+      model: PAGE_HEAD + `
+</head>
+<body>
+` + SITE_BODY + `
+</body>
+</html>
+`,
+      checks: [
+        (d) => (d.querySelector("header h1") ? null : "Add a header containing an h1 heading."),
+        (d) => (d.querySelector("nav ul") ? null : "The nav should contain an unordered list (ul)."),
+        (d) => (d.querySelectorAll("nav ul li a").length >= 4 ? null : "The nav list needs four links, each an a element inside an li."),
+        (d) => (d.querySelectorAll("main section").length >= 2 ? null : "Put at least two section elements inside main."),
+        (d) => (d.querySelector("footer") ? null : "Add a footer at the bottom of the page."),
+        (d) => (d.querySelector("header + nav, header ~ nav") && d.querySelector("main ~ footer") ? null : "Put the elements in order: header, nav, main, footer."),
+      ] },
+    { type: "web", id: "3b", q: "Give the main image the id <span class='mono'>hero</span>, and give each of the three activity sections the class <span class='mono'>activity</span>. Every image needs alt text.",
+      starter: PAGE_HEAD + `
+</head>
+<body>
+    <main>
+        <img src="images/loch-day.jpg" alt="Loch Morlich">
+        <section>
+            <h3>Kayaking</h3>
+        </section>
+        <section>
+            <h3>Climbing</h3>
+        </section>
+        <section>
+            <h3>Mountain biking</h3>
+        </section>
+    </main>
+</body>
+</html>
+`,
+      model: PAGE_HEAD + `
+</head>
+<body>
+    <main>
+        <img id="hero" src="images/loch-day.jpg" alt="Loch Morlich">
+        <section class="activity">
+            <h3>Kayaking</h3>
+        </section>
+        <section class="activity">
+            <h3>Climbing</h3>
+        </section>
+        <section class="activity">
+            <h3>Mountain biking</h3>
+        </section>
+    </main>
+</body>
+</html>
+`,
+      checks: [
+        (d) => (d.querySelector("img#hero") ? null : "Give the image the id hero: id=\"hero\"."),
+        (d) => (d.querySelectorAll("section.activity").length === 3 ? null : "All three sections need class=\"activity\"."),
+        (d) => (d.querySelectorAll("#hero").length === 1 ? null : "An id must be used only once on a page."),
+        (d) => ([...d.querySelectorAll("img")].every((i) => (i.getAttribute("alt") || "").trim()) ? null : "Every image needs alt text."),
+      ] },
+    { type: "choice", id: "3c", q: "Three sections should look the same. Should they share an id or a class?", options: ["An id, because they are the same", "A class, because an id can only be used once on a page"], correct: 1 },
+  ],
+  exam: [ { type: "written", id: "3x", q: "Explain the difference between an id and a class attribute.", marks: 2, points: ["An id identifies one unique element on a page", "A class can be given to many elements that share a style"] } ],
+},
+{
+  id: "css", num: 4, title: "CSS selectors and the box model",
+  intentions: ["I can use inline, internal and external CSS", "I can use class, id, grouping and descendant selectors", "I can use margin, padding, width and height"],
+  recall: [ { type: "choice", id: "4r1", q: "Recall: which element holds the navigation links?", options: ["header", "nav", "footer"], correct: 1 } ],
+  blocks: [
+    { type: "text", html: `<h3>Where CSS goes</h3><ul><li><b>Inline:</b> a style attribute on one element.</li><li><b>Internal:</b> a &lt;style&gt; element in the head; affects one page.</li><li><b>External:</b> a .css file linked from every page: one change updates the whole site, keeping it consistent and easier to maintain.</li></ul>
+      <h3>Selectors</h3><pre class="code">.activity { ... }         /* class */
+#hero { ... }             /* id */
+header, footer { ... }    /* grouping: both */
+.activity img { ... }     /* descendant: img inside .activity */</pre>` },
+    { type: "match", id: "4a", q: "Which kind of selector is each?", options: ["Class", "Id", "Grouping", "Descendant"], items: [[".activity", 0], ["#hero", 1], ["header, footer", 2], ["nav a", 3], ["section p", 3]] },
+    { type: "web", id: "4b", lang: "CSS", q: "Write internal CSS in the <span class='mono'>style</span> element: use <b>one grouping selector</b> to give the header and footer the same background colour, white text and 15px padding; and a <b>descendant selector</b> so images inside <span class='mono'>.activity</span> are 100% wide.",
+      starter: PAGE_HEAD + `
+    <style>
+
+    </style>
+</head>
+<body>
+` + SITE_BODY + `
+</body>
+</html>
+`,
+      model: PAGE_HEAD + `
+    <style>
+        header, footer {
+            background-color: #1f4d3a;
+            color: white;
+            padding: 15px;
+        }
+
+        .activity img {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+` + SITE_BODY + `
+</body>
+</html>
+`,
+      checks: [
+        (d) => (/(^|[{};\s])header\s*,\s*footer\s*\{|(^|[{};\s])footer\s*,\s*header\s*\{/.test(styleText(d)) ? null : "Use one grouping selector: header, footer { ... }"),
+        (d, w) => { const h = d.querySelector("header"), f = d.querySelector("footer"); const bg = css(w, h, "background-color"); return bg !== "rgba(0, 0, 0, 0)" && bg === css(w, f, "background-color") ? null : "Give the header and footer the same background-color."; },
+        (d, w) => (css(w, d.querySelector("header"), "color") === "rgb(255, 255, 255)" ? null : "The header text should be white."),
+        (d, w) => (css(w, d.querySelector("footer"), "padding-top") === "15px" ? null : "Give the header and footer 15px of padding."),
+        (d) => (/\.activity\s+img\s*\{/.test(styleText(d)) ? null : "Use the descendant selector .activity img"),
+        (d, w) => { const img = d.querySelector(".activity img"), sec = img.parentElement; const pad = parseFloat(css(w, sec, "padding-left")) + parseFloat(css(w, sec, "padding-right")); return Math.abs(img.getBoundingClientRect().width - (sec.getBoundingClientRect().width - pad)) < 2 ? null : "Images inside .activity should be 100% wide."; },
+      ] },
+    { type: "text", html: `<h3>The box model</h3><p>From the inside out: <b>content</b> (width, height), <b>padding</b>, <b>border</b>, <b>margin</b>. Padding is space inside the border; margin is space outside it. <span class="mono">margin: 0 auto</span> centres a block that has a set width.</p>` },
+    { type: "choice", id: "4c", q: "Which property adds space <b>outside</b> an element's border?", options: ["padding", "margin", "width"], correct: 1 },
+  ],
+  exam: [ { type: "written", id: "4x", q: "Explain why external CSS is more efficient than internal CSS for a ten-page website.", marks: 2, points: ["The styles are written once in one file, so one change updates every page and keeps them consistent", "The stylesheet is downloaded once, so pages load faster / there is less code to maintain"] } ],
+},
+{
+  id: "layout", num: 5, title: "Layout and navigation bars",
+  intentions: ["I can use display, float and clear", "I can build a horizontal navigation bar with a hover effect"],
+  recall: [ { type: "match", id: "5r1", q: "Recall: which selector?", options: ["Grouping", "Descendant"], items: [["h1, h2", 0], ["main p", 1]] } ],
+  blocks: [
+    { type: "text", html: `<h3>Display, float and clear</h3><ul><li><span class="mono">display: block</span> starts a new line and fills the width; <span class="mono">inline</span> sits in the line of text; <span class="mono">none</span> hides the element.</li><li><span class="mono">float: left</span> lets elements line up side by side as columns.</li><li><span class="mono">clear: both</span> moves an element below every float.</li></ul>
+      <h3>A horizontal navigation bar</h3><ol><li><span class="mono">list-style-type: none</span> removes the bullets.</li><li>Remove the list's margin and padding.</li><li><span class="mono">display: inline</span> on each li puts them side by side.</li><li>Style the links, and add a <span class="mono">:hover</span> rule.</li></ol>` },
+    { type: "web", id: "5a", lang: "CSS", q: "Turn the navigation list into a horizontal bar: no bullets, items side by side, links with no underline, and a <span class='mono'>nav a:hover</span> rule that changes the background colour.",
+      starter: PAGE_HEAD + `
+    <style>
+        nav ul {
+
+        }
+
+        nav li {
+
+        }
+
+        nav a {
+
+        }
+
+    </style>
+</head>
+<body>
+` + SITE_BODY + `
+</body>
+</html>
+`,
+      model: PAGE_HEAD + `
+    <style>
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            background-color: #2e6b52;
+        }
+
+        nav li {
+            display: inline;
+        }
+
+        nav a {
+            display: inline-block;
+            padding: 12px 18px;
+            color: white;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            background-color: #f2a541;
+        }
+    </style>
+</head>
+<body>
+` + SITE_BODY + `
+</body>
+</html>
+`,
+      checks: [
+        (d, w) => (css(w, d.querySelector("nav ul"), "list-style-type") === "none" ? null : "Remove the bullets with list-style-type: none on nav ul."),
+        (d, w) => ([...d.querySelectorAll("nav li")].every((x) => /^inline/.test(css(w, x, "display")) || css(w, x, "float") === "left") ? null : "The links should sit side by side: use display: inline (or float: left) on nav li."),
+        (d, w) => (css(w, d.querySelector("nav a"), "text-decoration-line") === "none" ? null : "Remove the underline from the links with text-decoration: none."),
+        (d) => (hoverRules(d).some((r) => /nav/.test(r.selectorText) && /background/.test(r.style.cssText)) ? null : "Add a nav a:hover rule that changes the background colour."),
+      ] },
+    { type: "web", id: "5b", lang: "CSS", q: "Lay out the three activity sections as columns with <span class='mono'>float: left</span> (try width 28% and margin-right 3%, with no padding), and make sure the footer sits below them with <span class='mono'>clear</span>.",
+      starter: PAGE_HEAD + `
+    <style>
+        .activity {
+
+        }
+
+        footer {
+
+        }
+
+        .activity img {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+` + SITE_BODY + `
+</body>
+</html>
+`,
+      model: PAGE_HEAD + `
+    <style>
+        .activity {
+            float: left;
+            width: 28%;
+            margin-right: 3%;
+        }
+
+        footer {
+            clear: both;
+        }
+
+        .activity img {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+` + SITE_BODY + `
+</body>
+</html>
+`,
+      checks: [
+        (d, w) => ([...d.querySelectorAll(".activity")].every((s) => css(w, s, "float") === "left") ? null : "Float each .activity section to the left."),
+        (d) => { const s = [...d.querySelectorAll(".activity")].map((x) => Math.round(x.getBoundingClientRect().top)); return s.every((t) => Math.abs(t - s[0]) < 4) ? null : "The three sections should be side by side. If one drops down, the widths, padding and margins add up to more than 100%."; },
+        (d, w) => (css(w, d.querySelector("footer"), "clear") === "both" ? null : "Give the footer clear: both so it sits below the floated sections."),
+      ] },
+    { type: "choice", id: "5c", q: "Four floated sections each have width 25% and padding 10px. Why does the fourth drop onto a new line?", options: ["Float only allows three columns", "25% × 4 already fills the width, and the padding makes the total wider", "Padding is not allowed on floated elements"], correct: 1 },
+  ],
+  exam: [ { type: "written", id: "5x", q: "Describe the effect of each: list-style-type: none; display: inline; nav a:hover { background-color: orange; }", marks: 3, points: ["Removes the bullet points from the list", "Makes the list items sit side by side on one line", "Changes a navigation link's background to orange while the mouse is over it"] } ],
+},
+{
+  id: "forms", num: 6, title: "Forms and validation",
+  intentions: ["I can build forms with text, number, radio, textarea, select and submit", "I can validate for presence, length and range"],
+  recall: [ { type: "choice", id: "6r1", q: "Recall: which property makes the footer sit below floated sections?", options: ["float: none", "clear: both", "display: block"], correct: 1 } ],
+  blocks: [
+    { type: "text", html: `<h3>Form elements</h3><table class="tbl"><tr><th>Element</th><th>Code</th></tr><tr><td>Text box</td><td>&lt;input type="text"&gt;</td></tr><tr><td>Number</td><td>&lt;input type="number"&gt;</td></tr><tr><td>Radio buttons</td><td>&lt;input type="radio"&gt; with the same name</td></tr><tr><td>Text area</td><td>&lt;textarea&gt;&lt;/textarea&gt;</td></tr><tr><td>Drop-down list</td><td>&lt;select&gt; with &lt;option&gt;</td></tr><tr><td>Submit</td><td>&lt;input type="submit"&gt;</td></tr></table>
+      <h3>Validation</h3><ul><li><b>Presence:</b> <span class="mono">required</span></li><li><b>Length:</b> <span class="mono">maxlength</span>, <span class="mono">minlength</span></li><li><b>Range:</b> <span class="mono">min</span> and <span class="mono">max</span> on a number input</li></ul>` },
+    { type: "match", id: "6a", q: "Which form element suits each?", options: ["Text box", "Number", "Radio buttons", "Drop-down list", "Text area"], items: [["A postcode", 0], ["Comments about a stay", 4], ["One of 30 council areas", 3], ["A rating from three choices shown together", 2], ["Number of people", 1]] },
+    { type: "web", id: "6b", q: "Build the booking form: a name text box (required, at most 40 characters); a number of people box (1 to 12, required); a drop-down list of the three activities; experience radio buttons (Beginner, Some, Expert) in one group; a message text area of at most 300 characters; and a submit button. Give each input a label.",
+      starter: PAGE_HEAD + `
+</head>
+<body>
+    <h2>Booking enquiry</h2>
+    <form>
+
+    </form>
+</body>
+</html>
+`,
+      model: PAGE_HEAD + `
+</head>
+<body>
+    <h2>Booking enquiry</h2>
+    <form>
+        <p>
+            <label for="fullname">Name</label>
+            <input type="text" id="fullname" name="fullname" required maxlength="40">
+        </p>
+        <p>
+            <label for="people">Number of people</label>
+            <input type="number" id="people" name="people" min="1" max="12" required>
+        </p>
+        <p>
+            <label for="activity">Activity</label>
+            <select id="activity" name="activity">
+                <option>Kayaking</option>
+                <option>Climbing</option>
+                <option>Mountain biking</option>
+            </select>
+        </p>
+        <p>
+            Experience:
+            <input type="radio" id="beginner" name="experience" value="beginner" checked>
+            <label for="beginner">Beginner</label>
+            <input type="radio" id="some" name="experience" value="some">
+            <label for="some">Some</label>
+            <input type="radio" id="expert" name="experience" value="expert">
+            <label for="expert">Expert</label>
+        </p>
+        <p>
+            <label for="message">Message</label>
+            <textarea id="message" name="message" maxlength="300"></textarea>
+        </p>
+        <p>
+            <input type="submit" value="Send enquiry">
+        </p>
+    </form>
+</body>
+</html>
+`,
+      checks: [
+        (d) => { const t = d.querySelector("form input[type=text]"); return t && t.required && t.maxLength === 40 ? null : "Add a text input with required and maxlength=\"40\"."; },
+        (d) => { const n = d.querySelector("form input[type=number]"); return n && n.min === "1" && n.max === "12" && n.required ? null : "Add a number input with min=\"1\", max=\"12\" and required."; },
+        (d) => { const s = d.querySelector("form select"); return s && s.options.length >= 3 ? null : "Add a select drop-down with three option elements."; },
+        (d) => { const r = [...d.querySelectorAll("form input[type=radio]")]; return r.length >= 3 && r.every((x) => x.name && x.name === r[0].name) ? null : "Add three radio buttons that share the same name, so only one can be chosen."; },
+        (d) => { const a = d.querySelector("form textarea"); return a && a.maxLength === 300 ? null : "Add a textarea with maxlength=\"300\"."; },
+        (d) => (d.querySelector("form input[type=submit], form button[type=submit], form button:not([type])") ? null : "Add a submit button."),
+        (d) => { const ids = [...d.querySelectorAll("form input:not([type=submit]):not([type=radio]), form select, form textarea")].map((x) => x.id); return ids.every((id) => id && d.querySelector(`label[for="${id}"]`)) ? null : "Give each text box, number, select and textarea an id, with a label whose for matches it."; },
+      ] },
+    { type: "gap", id: "6c", q: "Identify the type of validation.", text: "required = {{presence}} · max=\"100\" = {{range}} · maxlength=\"20\" = {{length}}" },
+  ],
+  exam: [ { type: "written", id: "6x", q: "Write the HTML for a number input called age that only accepts 11 to 18 and must be completed.", marks: 2, points: ["<input type=\"number\" name=\"age\" min=\"11\" max=\"18\"", "required"] } ],
+},
+{
+  id: "javascript", num: 7, title: "JavaScript mouse events",
+  intentions: ["I can write functions called by onmouseover, onmouseout and onclick", "I can change an element's src, style and content"],
+  recall: [ { type: "gap", id: "7r1", q: "Recall: name the validation.", text: "min and max give {{range}} validation." } ],
+  blocks: [
+    { type: "text", html: `<h3>Events call functions</h3><p>The element has an <b>id</b> and an event attribute naming a function. The function, in a &lt;script&gt; in the head, finds the element with <span class="mono">document.getElementById()</span> and changes it.</p><pre class="code">&lt;script&gt;
+    function showSunset() {
+        document.getElementById("hero").src = "images/loch-sunset.jpg";
+    }
+&lt;/script&gt;
+
+&lt;img id="hero" src="images/loch-day.jpg" alt="Loch"
+     onmouseover="showSunset()" onmouseout="showDay()"&gt;</pre>` },
+    { type: "web", id: "7a", lang: "JavaScript", q: "Complete <span class='mono'>showSunset()</span> and <span class='mono'>showDay()</span>, and add <span class='mono'>onmouseover</span> and <span class='mono'>onmouseout</span> to the image, so it shows <span class='mono'>images/loch-sunset.jpg</span> while the mouse is over it and <span class='mono'>images/loch-day.jpg</span> otherwise.",
+      starter: PAGE_HEAD + `
+    <script>
+        function showSunset() {
+
+        }
+
+        function showDay() {
+
+        }
+    <\/script>
+</head>
+<body>
+    <img id="hero" src="images/loch-day.jpg" alt="Loch Morlich">
+</body>
+</html>
+`,
+      model: PAGE_HEAD + `
+    <script>
+        function showSunset() {
+            document.getElementById("hero").src = "images/loch-sunset.jpg";
+        }
+
+        function showDay() {
+            document.getElementById("hero").src = "images/loch-day.jpg";
+        }
+    <\/script>
+</head>
+<body>
+    <img id="hero" src="images/loch-day.jpg" alt="Loch Morlich"
+         onmouseover="showSunset()" onmouseout="showDay()">
+</body>
+</html>
+`,
+      checks: [
+        (d) => { const i = d.getElementById("hero"); return i && i.getAttribute("onmouseover") ? null : "Add an onmouseover attribute to the image that calls showSunset()."; },
+        (d) => (d.getElementById("hero").getAttribute("onmouseout") ? null : "Add an onmouseout attribute that calls showDay()."),
+        (d, w, h) => { const i = d.getElementById("hero"); i.dispatchEvent(new w.MouseEvent("mouseover")); return i.getAttribute("src") === h.img("loch-sunset") ? null : "When the mouse moves over the image, its src should become images/loch-sunset.jpg."; },
+        (d, w, h) => { const i = d.getElementById("hero"); i.dispatchEvent(new w.MouseEvent("mouseout")); return i.getAttribute("src") === h.img("loch-day") ? null : "When the mouse leaves, the src should go back to images/loch-day.jpg."; },
+      ] },
+    { type: "web", id: "7b", lang: "JavaScript", q: "Write <span class='mono'>toggleTimes()</span> so that each click of the button shows the hidden paragraph (display block), then hides it again (display none).",
+      starter: PAGE_HEAD + `
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        function toggleTimes() {
+
+        }
+    <\/script>
+</head>
+<body>
+    <p><button onclick="toggleTimes()">Show opening times</button></p>
+    <p id="times" class="hidden">Open daily, 9am to 5pm.</p>
+</body>
+</html>
+`,
+      model: PAGE_HEAD + `
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        function toggleTimes() {
+            if (document.getElementById("times").style.display == "block") {
+                document.getElementById("times").style.display = "none";
+            } else {
+                document.getElementById("times").style.display = "block";
+            }
+        }
+    <\/script>
+</head>
+<body>
+    <p><button onclick="toggleTimes()">Show opening times</button></p>
+    <p id="times" class="hidden">Open daily, 9am to 5pm.</p>
+</body>
+</html>
+`,
+      checks: [
+        (d, w) => (css(w, d.getElementById("times"), "display") === "none" ? null : "The paragraph should start hidden."),
+        (d, w) => { d.querySelector("button").click(); return css(w, d.getElementById("times"), "display") !== "none" ? null : "The first click should show the paragraph: set its style.display to \"block\"."; },
+        (d, w) => { d.querySelector("button").click(); return css(w, d.getElementById("times"), "display") === "none" ? null : "The second click should hide it again: set style.display to \"none\"."; },
+      ] },
+    { type: "web", id: "7c", lang: "JavaScript", q: "Make the section's background change colour when the mouse is over it and change back when the mouse leaves, using two functions.",
+      starter: PAGE_HEAD + `
+    <script>
+
+    <\/script>
+</head>
+<body>
+    <section id="kayak-box">
+        <h3>Kayaking</h3>
+        <p>Paddle Loch Morlich with a qualified instructor.</p>
+    </section>
+</body>
+</html>
+`,
+      model: PAGE_HEAD + `
+    <script>
+        function highlight() {
+            document.getElementById("kayak-box").style.backgroundColor = "#fde7c2";
+        }
+
+        function unhighlight() {
+            document.getElementById("kayak-box").style.backgroundColor = "white";
+        }
+    <\/script>
+</head>
+<body>
+    <section id="kayak-box" onmouseover="highlight()" onmouseout="unhighlight()">
+        <h3>Kayaking</h3>
+        <p>Paddle Loch Morlich with a qualified instructor.</p>
+    </section>
+</body>
+</html>
+`,
+      checks: [
+        (d, w) => { const s = d.getElementById("kayak-box"); const before = css(w, s, "background-color"); s.dispatchEvent(new w.MouseEvent("mouseover")); const over = css(w, s, "background-color"); return over !== before ? null : "On mouseover, change the section's style.backgroundColor."; },
+        (d, w) => { const s = d.getElementById("kayak-box"); s.dispatchEvent(new w.MouseEvent("mouseover")); const over = css(w, s, "background-color"); s.dispatchEvent(new w.MouseEvent("mouseout")); return css(w, s, "background-color") !== over ? null : "On mouseout, change the background back."; },
+      ] },
+  ],
+  exam: [ { type: "written", id: "7x", q: "Describe what happens when the user moves the mouse onto, then off, the image in Try it 7.1.", marks: 2, points: ["Moving onto the image runs showSunset(), which changes its src so the sunset photo shows", "Moving off runs showDay(), which puts the original photo back"] } ],
+},
+{
+  id: "testing", num: 8, title: "Testing",
+  intentions: ["I can plan usability tests with personas, scenarios and test cases", "I can test validation, navigation, media and compatibility"],
+  recall: [ { type: "choice", id: "8r1", q: "Recall: which event runs when the mouse leaves an element?", options: ["onclick", "onmouseout", "onmouseover"], correct: 1 } ],
+  blocks: [
+    { type: "text", html: `<h3>Usability testing</h3><ul><li>A <b>persona</b> is a made-up but realistic description of a typical user.</li><li>A <b>scenario</b> is a short story of a task that persona wants to complete, and why.</li><li>A <b>test case</b> is a specific step-by-step task with an expected outcome.</li></ul><p>These are carried out on the low-fidelity prototype, before coding.</p>` },
+    { type: "match", id: "8a", q: "Persona, scenario or test case?", options: ["Persona", "Scenario", "Test case"], items: [["Fiona, 42, primary teacher, browses on her phone, dislikes long forms", 0], ["Fiona has ten minutes at lunch to check climbing for beginners and send an enquiry", 1], ["From the home page, reach the Climbing page in two clicks", 2]] },
+    { type: "match", id: "8b", q: "The number of people must be from 1 to 12. Classify each test value.", options: ["Normal", "Extreme", "Exceptional"], items: [["6", 0], ["1", 1], ["12", 1], ["0", 2], ["13", 2]] },
+    { type: "text", html: `<h3>Functional and compatibility testing</h3><ul><li><b>Navigation:</b> every link opens the correct page.</li><li><b>Media:</b> every image, video and audio file displays or plays.</li><li><b>Validation:</b> normal, extreme and exceptional data.</li><li><b>Compatibility:</b> different devices (desktop, tablet, smartphone) and browsers.</li></ul>` },
+    { type: "choice", id: "8c", q: "Why must a site with image swaps be tested on a phone?", options: ["Phones can't show images", "Touch screens have no mouse-over, so the swap may not work", "Phones block JavaScript"], correct: 1 },
+  ],
+  exam: [ { type: "written", id: "8x", q: "Explain what is meant by a persona and why it is used in usability testing.", marks: 2, points: ["A made-up but realistic description of a typical user", "Lets the developer test the site from that user's point of view, with their needs and skills"] } ],
+},
+{
+  id: "evaluation", num: 9, title: "Evaluation and final challenge",
+  intentions: ["I can evaluate fitness for purpose and usability", "I can build a complete page from a brief"],
+  recall: [ { type: "match", id: "9r1", q: "Recall: classify for a range of 1 to 12.", options: ["Normal", "Extreme", "Exceptional"], items: [["12", 1], ["20", 2]] } ],
+  blocks: [
+    { type: "text", html: `<h3>Evaluation</h3><ul><li><b>Fitness for purpose:</b> meets all the end-user and functional requirements, with test evidence.</li><li><b>Usability:</b> consistent navigation and layout, readable text, clear labels and validation messages, and results of compatibility testing.</li></ul>` },
+    { type: "choice", id: "9a", q: "A site uses a different background colour on every page. Which criterion does this affect?", options: ["Fitness for purpose", "Usability"], correct: 1 },
+    { type: "text", html: `<h3>Final challenge: Loch Leven Library</h3><p>Build the <b>Join</b> page: a horizontal navigation bar (Home, Events, Visit, Join) with a hover effect, and a form with the child's name (required, at most 30 characters), age (5 to 14, required), parent's email (required), branch drop-down (Kinross, Milnathort, Mobile Library), used-before radio buttons (Yes/No) and comments (at most 200 characters), plus a submit button.</p>` },
+    { type: "web", id: "9b", q: "Build the Join page.",
+      starter: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Join - Loch Leven Library</title>
+    <style>
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Loch Leven Library</h1>
+    </header>
+
+</body>
+</html>
+`,
+      model: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Join - Loch Leven Library</title>
+    <style>
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            background-color: #f0b429;
+        }
+
+        nav li {
+            display: inline;
+        }
+
+        nav a {
+            display: inline-block;
+            padding: 12px 18px;
+            color: #283d73;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            background-color: #283d73;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Loch Leven Library</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="visit.html">Visit</a></li>
+            <li><a href="join.html">Join</a></li>
+        </ul>
+    </nav>
+    <main>
+        <form>
+            <p><label for="child">Child's name</label>
+               <input type="text" id="child" name="child" required maxlength="30"></p>
+            <p><label for="age">Child's age</label>
+               <input type="number" id="age" name="age" min="5" max="14" required></p>
+            <p><label for="email">Parent's email</label>
+               <input type="text" id="email" name="email" required></p>
+            <p><label for="branch">Branch</label>
+               <select id="branch" name="branch">
+                   <option>Kinross</option>
+                   <option>Milnathort</option>
+                   <option>Mobile Library</option>
+               </select></p>
+            <p>Used the library before?
+               <input type="radio" id="yes" name="before" value="yes"> <label for="yes">Yes</label>
+               <input type="radio" id="no" name="before" value="no" checked> <label for="no">No</label></p>
+            <p><label for="comments">Comments</label>
+               <textarea id="comments" name="comments" maxlength="200"></textarea></p>
+            <p><input type="submit" value="Join"></p>
+        </form>
+    </main>
+</body>
+</html>
+`,
+      checks: [
+        (d) => (d.querySelectorAll("nav ul li a").length >= 4 ? null : "Add a nav with an unordered list of four links."),
+        (d, w) => (css(w, d.querySelector("nav ul"), "list-style-type") === "none" ? null : "Remove the bullets from the nav list."),
+        (d, w) => ([...d.querySelectorAll("nav li")].every((x) => /^inline/.test(css(w, x, "display")) || css(w, x, "float") === "left") ? null : "Make the nav links sit side by side: display: inline on nav li."),
+        (d) => (hoverRules(d).some((r) => /nav/.test(r.selectorText)) ? null : "Add a hover effect to the nav links."),
+        (d) => { const t = d.querySelectorAll("form input[type=text]"); return t.length >= 2 && [...t].every((x) => x.required) && [...t].some((x) => x.maxLength === 30) ? null : "Add the child's name (required, maxlength 30) and parent's email (required) text boxes."; },
+        (d) => { const n = d.querySelector("form input[type=number]"); return n && n.min === "5" && n.max === "14" && n.required ? null : "Add the age as a number input from 5 to 14, required."; },
+        (d) => { const s = d.querySelector("form select"); return s && s.options.length === 3 ? null : "Add the branch drop-down with three options."; },
+        (d) => { const r = [...d.querySelectorAll("form input[type=radio]")]; return r.length >= 2 && r.every((x) => x.name === r[0].name) ? null : "Add Yes and No radio buttons in one group (same name)."; },
+        (d) => { const a = d.querySelector("form textarea"); return a && a.maxLength === 200 ? null : "Add a comments textarea with maxlength 200."; },
+        (d) => (d.querySelector("form input[type=submit], form button") ? null : "Add a submit button."),
+      ] },
+  ],
+  exam: [ { type: "written", id: "9x", q: "Describe two features of a website that improve its usability.", marks: 2, points: ["A consistent navigation bar on every page, with a hover effect showing links", "Consistent colours and layout / readable text with good contrast / clear form labels and messages"] } ],
+},
+];
+
+// ---------- state ----------
+const KEY = BOOK.key;
+let S = { tasks: {}, rag: {} };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) { /* storage unavailable */ }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ } }
+const T = (id) => (S.tasks[id] = S.tasks[id] || { att: 0 });
+const isDone = (id) => { const t = S.tasks[id]; return !!t && ["correct", "shown", "marked"].includes(t.s); };
+
+const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const el = (html) => { const d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstChild; };
+
+function countable(ch) { return [...ch.recall, ...ch.blocks, ...ch.exam].filter((b) => !["text", "figure", "gen", "dbview"].includes(b.type)); }
+function progress(ch) { const items = countable(ch); const done = items.filter((b) => isDone(b.id)).length; return { done, total: items.length }; }
+
+// ---------- task shell ----------
+function shell(b, label, body, extra = "") {
+  const t = S.tasks[b.id];
+  const status = t && t.s === "correct" ? "is-correct" : t && t.s === "shown" ? "is-shown" : t && t.s === "marked" ? "is-marked" : "";
+  return `<section class="task ${status}" data-id="${b.id}" id="task-${b.id}">
+    <div class="task-head"><span class="tag">${label}</span>${b.marks ? `<span class="marks">${b.marks} mark${b.marks > 1 ? "s" : ""}</span>` : ""}</div>
+    <div class="q">${b.q}</div>${body}
+    <div class="actions">${extra}${b.hint ? `<button class="ghost hint-btn" type="button">Hint</button>` : ""}<button class="ghost show-btn" type="button" ${t && t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show answer</button></div>
+    ${b.hint ? `<div class="hint" hidden>${b.hint}</div>` : ""}
+    <div class="feedback" aria-live="polite">${t && t.s === "correct" ? "Correct." : t && t.s === "shown" ? "Answer shown. Try the next one on your own." : ""}</div></section>`;
+}
+const checkBtn = `<button class="primary check-btn" type="button">Check</button>`;
+
+function placeRow(kind, n) {
+  if (kind === "none") return "";
+  const vals = [];
+  for (let i = 0; i < n; i++) vals.push(2 ** (n - 1 - i));
+  if (kind === "twos") vals[0] = "−" + vals[0];
+  return `<div class="bitrow places">${vals.map((v) => `<span>${v}</span>`).join("")}</div>`;
+}
+function bitCells(group, n, values) {
+  let h = "";
+  for (let i = 0; i < n; i++) h += `<button type="button" class="bit" data-group="${group}" data-i="${i}" aria-label="${group} bit ${i + 1}">${values ? values[i] : "0"}</button>`;
+  return h;
+}
+
+// ---------- renderers ----------
+const R = {
+  num(b, label) {
+    const t = S.tasks[b.id] || {};
+    return shell(b, label, `<div class="answer-row"><input type="text" inputmode="decimal" autocomplete="off" id="in-${b.id}" aria-label="Your answer" value="${esc(t.v ?? "")}"></div>`, checkBtn);
+  },
+  gap(b, label) {
+    const t = S.tasks[b.id] || {};
+    let k = 0;
+    const html = b.text.replace(/\{\{([^}]+)\}\}/g, (m, a) => { const i = k++; const v = (t.v || [])[i] ?? ""; return `<input class="gap" type="text" autocomplete="off" data-k="${i}" aria-label="Gap ${i + 1}" style="width:${Math.max(4, a.split("|")[0].length + 2)}ch" value="${esc(v)}">`; });
+    return shell(b, label, `<p class="gap-text">${html}</p>`, checkBtn);
+  },
+  bits(b, label) {
+    const t = S.tasks[b.id] || {};
+    return shell(b, label, `<div class="bits">${placeRow(b.places || "twos", b.n)}<div class="bitrow">${bitCells("b", b.n, t.v)}</div></div><p class="small">Click a bit to change it.</p>`, checkBtn);
+  },
+  fp(b, label) {
+    const t = S.tasks[b.id] || {};
+    const v = t.v || {};
+    return shell(b, label, `<div class="fp">
+      <div class="fp-part"><span class="fp-label">Sign</span><div class="bitrow">${bitCells("s", 1, v.s)}</div></div>
+      <div class="fp-part"><span class="fp-label">Mantissa (15 bits)</span><div class="bitrow">${bitCells("m", 15, v.m)}</div></div>
+      <div class="fp-part"><span class="fp-label">Exponent (8 bits)</span><div class="bitrow">${bitCells("e", 8, v.e)}</div></div></div><p class="small">Click a bit to change it.</p>`, checkBtn);
+  },
+  choice(b, label) {
+    const t = S.tasks[b.id] || {};
+    return shell(b, label, `<div class="opts">${b.options.map((o, i) => `<button type="button" class="opt ${t.v === i ? "picked" : ""}" data-i="${i}">${o}</button>`).join("")}</div>`);
+  },
+  multi(b, label) {
+    const t = S.tasks[b.id] || {};
+    const v = t.v || [];
+    return shell(b, label, `<div class="opts">${b.options.map((o, i) => `<button type="button" class="opt toggle ${v.includes(i) ? "picked" : ""}" aria-pressed="${v.includes(i)}" data-i="${i}">${o}</button>`).join("")}</div>`, checkBtn);
+  },
+  match(b, label) {
+    const t = S.tasks[b.id] || {};
+    const v = t.v || [];
+    return shell(b, label, `<div class="match">${b.items.map((it, i) => `<label class="match-row"><span>${it[0]}</span><select data-k="${i}" aria-label="${esc(it[0])}"><option value="">Choose…</option>${b.options.map((o, j) => `<option value="${j}" ${String(v[i]) === String(j) ? "selected" : ""}>${o}</option>`).join("")}</select></label>`).join("")}</div>`, checkBtn);
+  },
+  order(b, label) {
+    const t = S.tasks[b.id] || {};
+    const shown = seededShuffle(b.items, b.id);
+    const v = t.v || [];
+    return shell(b, label, `<div class="match">${shown.map((it, i) => `<label class="match-row"><span class="${b.mono ? "mono-line" : ""}">${b.mono ? esc(it) : it}</span><select data-k="${i}" aria-label="Position of ${esc(it)}"><option value="">#</option>${b.items.map((_, j) => `<option value="${j + 1}" ${String(v[i]) === String(j + 1) ? "selected" : ""}>${j + 1}</option>`).join("")}</select></label>`).join("")}</div>`, checkBtn);
+  },
+  written(b, label) {
+    const t = S.tasks[b.id] || {};
+    const marked = t.s === "marked";
+    return shell(b, label, `<textarea rows="${Math.max(3, b.marks * 2)}" id="in-${b.id}" aria-label="Your answer">${esc(t.v || "")}</textarea>
+      <div class="points" ${marked ? "" : "hidden"}><p class="small">Tick each marking point your answer makes.</p>${b.points.map((p, i) => `<label class="point"><input type="checkbox" data-k="${i}" ${(t.ticks || []).includes(i) ? "checked" : ""}> <span>${p}</span></label>`).join("")}<p class="score">${marked ? `You gave yourself ${(t.ticks || []).length} of ${b.marks}.` : ""}</p></div>`,
+      `<button class="primary mark-btn" type="button">${marked ? "Hide marking points" : "Mark my answer"}</button>`);
+  },
+  trace(b, label) {
+    const t = S.tasks[b.id] || {};
+    let k = 0;
+    const cellHtml = (c) => c.replace(/\{\{([^}]+)\}\}/g, (m, a) => { const i = k++; const v = (t.v || [])[i] ?? ""; return `<input class="gap" type="text" autocomplete="off" data-k="${i}" aria-label="Trace cell ${i + 1}" style="width:${Math.max(5, a.split("|")[0].length + 2)}ch" value="${esc(v)}">`; });
+    return shell(b, label, `<div class="trace-wrap"><table class="tbl trace"><tr>${b.cols.map((c) => `<th>${c}</th>`).join("")}</tr>${b.rows.map((r) => `<tr>${r.map((c) => `<td class="mono">${cellHtml(c)}</td>`).join("")}</tr>`).join("")}</table></div>`, checkBtn);
+  },
+  code(b, label) {
+    const t = S.tasks[b.id] || {};
+    const src = t.v ?? b.starter;
+    const files = Object.keys(b.files || {});
+    return `<section class="task code-task ${t.s === "correct" ? "is-correct" : t.s === "shown" ? "is-shown" : ""}" data-id="${b.id}" id="task-${b.id}">
+      <div class="task-head"><span class="tag">${label}</span><span class="marks">Python</span></div>
+      <div class="q">${b.q}</div>
+      ${files.length ? `<details class="files"><summary>Files this program can open: ${files.map((f) => `<span class="mono">${f}</span>`).join(", ")}</summary>${files.map((f) => `<p class="small mono">${f}</p><pre class="code">${esc(b.files[f])}</pre>`).join("")}</details>` : ""}
+      <textarea class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(26, Math.max(8, src.split("\n").length + 1))}" aria-label="Your Python code">${esc(src)}</textarea>
+      <label class="stdin-label small">Keyboard input for Run, one value per line <textarea class="stdin" rows="2" spellcheck="false" aria-label="Keyboard input for Run">${esc(t.stdin ?? b.runInputs ?? "")}</textarea></label>
+      <div class="actions"><button class="ghost run-btn" type="button">Run</button><button class="primary code-check" type="button">Check</button><button class="ghost reset-code" type="button">Reset code</button><button class="ghost model-btn" type="button" ${t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show model answer</button></div>
+      <div class="higher-note" hidden></div>
+      <pre class="console" hidden></pre>
+      <div class="feedback" aria-live="polite">${t.s === "correct" ? "All tests passed." : ""}</div>
+      <div class="model" hidden><p class="small"><b>Model answer.</b> Compare it with yours, then try writing it again without looking.</p><pre class="code">${esc(b.model)}</pre></div>
+    </section>`;
+  },
+  web(b, label) {
+    const t = S.tasks[b.id] || {};
+    const src = t.v ?? b.starter;
+    return `<section class="task code-task web-task ${t.s === "correct" ? "is-correct" : t.s === "shown" ? "is-shown" : ""}" data-id="${b.id}" id="task-${b.id}">
+      <div class="task-head"><span class="tag">${label}</span><span class="marks">${b.lang || "HTML"}</span></div>
+      <div class="q">${b.q}</div>
+      <div class="web-grid"><textarea class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(28, Math.max(10, src.split("\n").length + 1))}" aria-label="Your code">${esc(src)}</textarea>
+      <div class="preview-wrap"><p class="small">Preview</p><iframe class="preview" title="Preview of your page" sandbox="allow-scripts allow-same-origin"></iframe></div></div>
+      <div class="actions"><button class="ghost run-btn" type="button">Update preview</button><button class="primary code-check" type="button">Check</button><button class="ghost reset-code" type="button">Reset code</button><button class="ghost model-btn" type="button" ${t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show model answer</button></div>
+      <div class="feedback" aria-live="polite">${t.s === "correct" ? "All checks passed." : ""}</div>
+      <div class="model" hidden><p class="small"><b>Model answer.</b> Compare it with yours, then try writing it again without looking.</p><pre class="code">${esc(b.model)}</pre></div>
+    </section>`;
+  },
+  sql(b, label) {
+    const t = S.tasks[b.id] || {};
+    const src = t.v ?? b.starter ?? "";
+    return `<section class="task code-task sql-task ${t.s === "correct" ? "is-correct" : t.s === "shown" ? "is-shown" : ""}" data-id="${b.id}" id="task-${b.id}">
+      <div class="task-head"><span class="tag">${label}</span><span class="marks">SQL</span></div>
+      <div class="q">${b.q}</div>
+      <textarea class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(14, Math.max(4, src.split("\n").length + 1))}" aria-label="Your SQL">${esc(src)}</textarea>
+      <div class="actions"><button class="ghost run-btn" type="button">Run</button><button class="primary code-check" type="button">Check</button><button class="ghost reset-code" type="button">Reset</button><button class="ghost model-btn" type="button" ${t.att >= 2 && t.s !== "correct" ? "" : "hidden"}>Show model answer</button></div>
+      <div class="sql-out"></div>
+      <div class="feedback" aria-live="polite">${t.s === "correct" ? "Correct: your results match." : ""}</div>
+      <div class="model" hidden><p class="small"><b>Model answer.</b> Other correct versions are possible.</p><pre class="code">${esc(b.model)}</pre></div>
+    </section>`;
+  },
+  dbview() {
+    return `<details class="dbview"><summary>Show the database tables</summary><div class="dbview-body">${Object.entries(DB.tables).map(([name, tb]) => `<h4 class="mono">${name}</h4><div class="trace-wrap"><table class="tbl result">${`<tr>${tb.cols.map((c) => `<th>${c}</th>`).join("")}</tr>`}${tb.rows.map((r) => `<tr>${r.map((v) => `<td>${esc(v === null ? "" : v === true ? "True" : v === false ? "False" : v)}</td>`).join("")}</tr>`).join("")}</table></div>`).join("")}</div></details>`;
+  },
+  text(b) { return `<div class="prose">${b.html}</div>`; },
+  figure(b) { return `<figure class="fig">${b.html}</figure>`; },
+  gen(b) {
+    return `<section class="task gen" data-id="${b.id}" data-kind="${b.kind}"><div class="task-head"><span class="tag gen-tag">Practice machine</span><span class="streak" aria-live="polite"></span></div><div class="q gen-title">${b.title}</div><div class="gen-body"></div>
+      <div class="actions"><button class="primary gen-check" type="button">Check</button><button class="ghost gen-new" type="button">New question</button><button class="ghost gen-show" type="button" hidden>Show answer</button></div><div class="feedback" aria-live="polite"></div></section>`;
+  },
+};
+
+// ---------- reading answers ----------
+const readBits = (node, g) => [...node.querySelectorAll(`.bit[data-group="${g}"]`)].map((x) => x.textContent).join("");
+function markBits(node, g, answer) {
+  node.querySelectorAll(`.bit[data-group="${g}"]`).forEach((x, i) => x.classList.toggle("wrong", x.textContent !== answer[i]));
+}
+function fillBits(node, g, answer) { node.querySelectorAll(`.bit[data-group="${g}"]`).forEach((x, i) => { x.textContent = answer[i]; x.classList.remove("wrong"); }); }
+
+function evaluate(b, node) {
+  switch (b.type) {
+    case "num": { const v = node.querySelector("input").value; return { v, ok: sameNumber(v, b.answer) }; }
+    case "gap": {
+      const ins = [...node.querySelectorAll("input.gap")];
+      const answers = [...b.text.matchAll(/\{\{([^}]+)\}\}/g)].map((m) => m[1].split("|"));
+      const v = ins.map((i) => i.value);
+      let ok = true;
+      ins.forEach((inp, i) => { const good = sameText(inp.value, answers[i]); inp.classList.toggle("wrong", !good); if (!good) ok = false; });
+      return { v, ok };
+    }
+    case "trace": {
+      const ins = [...node.querySelectorAll("input.gap")];
+      const answers = [...b.rows.flat().join("\u0001").matchAll(/\{\{([^}]+)\}\}/g)].map((m) => m[1].split("|"));
+      const v = ins.map((i) => i.value);
+      let ok = true;
+      ins.forEach((inp, i) => { const good = sameText(inp.value, answers[i]); inp.classList.toggle("wrong", !good); if (!good) ok = false; });
+      return { v, ok };
+    }
+    case "bits": { const v = readBits(node, "b"); markBits(node, "b", b.answer); return { v: v.split(""), ok: v === b.answer }; }
+    case "fp": {
+      const a = fpEncode(b.value);
+      const v = { s: readBits(node, "s").split(""), m: readBits(node, "m").split(""), e: readBits(node, "e").split("") };
+      markBits(node, "s", a.sign); markBits(node, "m", a.mantissa); markBits(node, "e", a.exponent);
+      return { v, ok: v.s.join("") === a.sign && v.m.join("") === a.mantissa && v.e.join("") === a.exponent };
+    }
+    case "multi": {
+      const v = [...node.querySelectorAll(".opt.picked")].map((x) => Number(x.dataset.i));
+      const ok = v.length === b.correct.length && b.correct.every((c) => v.includes(c));
+      return { v, ok };
+    }
+    case "match": {
+      const sels = [...node.querySelectorAll("select")];
+      const v = sels.map((s) => s.value);
+      let ok = true;
+      sels.forEach((s, i) => { const good = s.value !== "" && Number(s.value) === b.items[i][1]; s.classList.toggle("wrong", !good); if (!good) ok = false; });
+      return { v, ok };
+    }
+    case "order": {
+      const shown = seededShuffle(b.items, b.id);
+      const sels = [...node.querySelectorAll("select")];
+      const v = sels.map((s) => s.value);
+      let ok = true;
+      sels.forEach((s, i) => { const good = Number(s.value) === b.items.indexOf(shown[i]) + 1; s.classList.toggle("wrong", !good); if (!good) ok = false; });
+      return { v, ok };
+    }
+  }
+}
+function revealAnswer(b, node) {
+  switch (b.type) {
+    case "num": node.querySelector("input").value = b.answer; break;
+    case "gap": { const answers = [...b.text.matchAll(/\{\{([^}]+)\}\}/g)].map((m) => m[1].split("|")[0]); node.querySelectorAll("input.gap").forEach((inp, i) => { inp.value = answers[i]; inp.classList.remove("wrong"); }); break; }
+    case "trace": { const answers = [...b.rows.flat().join("\u0001").matchAll(/\{\{([^}]+)\}\}/g)].map((m) => m[1].split("|")[0]); node.querySelectorAll("input.gap").forEach((inp, i) => { inp.value = answers[i]; inp.classList.remove("wrong"); }); break; }
+    case "bits": fillBits(node, "b", b.answer); break;
+    case "fp": { const a = fpEncode(b.value); fillBits(node, "s", a.sign); fillBits(node, "m", a.mantissa); fillBits(node, "e", a.exponent); break; }
+    case "choice": node.querySelectorAll(".opt").forEach((x) => x.classList.toggle("picked", Number(x.dataset.i) === b.correct)); break;
+    case "multi": node.querySelectorAll(".opt").forEach((x) => x.classList.toggle("picked", b.correct.includes(Number(x.dataset.i)))); break;
+    case "match": node.querySelectorAll("select").forEach((s, i) => { s.value = b.items[i][1]; s.classList.remove("wrong"); }); break;
+    case "order": { const shown = seededShuffle(b.items, b.id); node.querySelectorAll("select").forEach((s, i) => { s.value = b.items.indexOf(shown[i]) + 1; s.classList.remove("wrong"); }); break; }
+  }
+}
+
+// ---------- generators ----------
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = (arr) => arr[rnd(0, arr.length - 1)];
+const GEN = {
+  twos() { const n = rnd(-128, -1); return { q: `Represent <b>${n}</b> in 8-bit two's complement.`, input: "bits", n: 8, answer: toTwos(n, 8) }; },
+  fromTwos() { const n = rnd(-128, -1); return { q: `Convert <span class="mono">${toTwos(n, 8)}</span> to denary.`, input: "num", answer: n }; },
+  fp() { const fr = pick([0, 0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875]); let v = rnd(0, 40) + fr; if (v === 0) v = 0.75; if (Math.random() < 0.4) v = -v; return { q: `Represent <b>${v}</b> in floating point (sign, 15-bit mantissa, 8-bit exponent).`, input: "fp", value: v }; },
+  fpToDen() { const fr = pick([0.5, 0.25, 0.75, 0.125, 0.375]); let v = rnd(0, 20) + fr; if (Math.random() < 0.4) v = -v; const a = fpEncode(v); return { q: `Convert to denary: sign <span class="mono">${a.sign}</span>, mantissa <span class="mono">${a.mantissa}</span>, exponent <span class="mono">${a.exponent}</span>.`, input: "num", answer: v }; },
+  text() { const c = pick([250, 500, 1200, 1500, 2000, 4000]); const bits = pick([8, 16, 32]); return { q: `How many bytes are needed for <b>${c}</b> characters in ${bits === 8 ? "8-bit extended ASCII" : bits + "-bit Unicode"}?`, input: "num", answer: (c * bits) / 8 }; },
+  bitmap() { const w = pick([640, 800, 1024, 1280, 1920]); const h = pick([480, 600, 720, 768, 1080]); const d = pick([1, 8, 16, 24]); return { q: `What is the file size in <b>bytes</b> of a ${w} × ${h} image with a colour depth of ${d} bit${d > 1 ? "s" : ""}?`, input: "num", answer: (w * h * d) / 8 }; },
+
+  predef() {
+    const words = ["Glasgow", "Inverness", "Aberdeen", "Stirling", "Dundee", "Kirkwall", "Paisley"];
+    const kind = pick(["mod", "int", "sub", "ord", "chr"]);
+    if (kind === "mod") { const x = rnd(10, 99), y = rnd(2, 9); return { q: `What is <span class="mono">${x} % ${y}</span>?`, input: "num", answer: x % y }; }
+    if (kind === "int") { const x = rnd(10, 99), y = rnd(2, 9); return { q: `What is <span class="mono">int(${x} / ${y})</span>?`, input: "num", answer: Math.floor(x / y) }; }
+    if (kind === "sub") { const w = pick(words), a = rnd(0, 2), e = a + rnd(2, 4); return { q: `What is <span class="mono">"${w}"[${a}:${e}]</span>?`, input: "text", answer: w.slice(a, e) }; }
+    if (kind === "ord") { const c = String.fromCharCode(pick([rnd(65, 90), rnd(97, 122)])); return { q: `What is <span class="mono">ord("${c}")</span>?`, input: "num", answer: c.charCodeAt(0) }; }
+    const n = rnd(65, 90); return { q: `What is <span class="mono">chr(${n})</span>?`, input: "text", answer: String.fromCharCode(n) };
+  },
+  maxpos() {
+    const vals = []; while (vals.length < 6) { const v = rnd(2500, 4200); if (!vals.includes(v)) vals.push(v); }
+    const findMax = Math.random() < 0.5; let pos = 0;
+    for (let i = 1; i < vals.length; i++) if (findMax ? vals[i] > vals[pos] : vals[i] < vals[pos]) pos = i;
+    return { q: `<span class="mono">times = [${vals.join(", ")}]</span><br>Find-${findMax ? "maximum" : "minimum"} returns a position. What position does it return? (The first element is position 0.)`, input: "num", answer: pos };
+  },
+};
+const genState = {};
+function newGen(node) {
+  const kind = node.dataset.kind;
+  const g = GEN[kind]();
+  const st = (genState[node.dataset.id] = genState[node.dataset.id] || { streak: 0, done: 0 });
+  st.cur = g; st.att = 0; st.solved = false;
+  let body = `<p class="q">${g.q}</p>`;
+  if (g.input === "num") body += `<div class="answer-row"><input type="text" inputmode="decimal" autocomplete="off" aria-label="Your answer"></div>`;
+  if (g.input === "text") body += `<div class="answer-row"><input type="text" autocomplete="off" aria-label="Your answer"></div>`;
+  if (g.input === "bits") body += `<div class="bits">${placeRow("twos", 8)}<div class="bitrow">${bitCells("b", 8)}</div></div>`;
+  if (g.input === "fp") body += `<div class="fp"><div class="fp-part"><span class="fp-label">Sign</span><div class="bitrow">${bitCells("s", 1)}</div></div><div class="fp-part"><span class="fp-label">Mantissa (15 bits)</span><div class="bitrow">${bitCells("m", 15)}</div></div><div class="fp-part"><span class="fp-label">Exponent (8 bits)</span><div class="bitrow">${bitCells("e", 8)}</div></div></div>`;
+  node.querySelector(".gen-body").innerHTML = body;
+  node.querySelector(".feedback").textContent = "";
+  node.querySelector(".gen-show").hidden = true;
+  node.classList.remove("is-correct");
+  updateStreak(node);
+}
+function updateStreak(node) { const st = genState[node.dataset.id]; node.querySelector(".streak").textContent = st && st.done ? `${st.done} solved · streak ${st.streak}` : ""; }
+function checkGen(node) {
+  const st = genState[node.dataset.id]; const g = st.cur; let ok;
+  if (g.input === "num") ok = sameNumber(node.querySelector(".gen-body input").value, g.answer);
+  if (g.input === "text") ok = node.querySelector(".gen-body input").value.trim().replace(/^["']|["']$/g, "") === g.answer;
+  if (g.input === "bits") { ok = readBits(node, "b") === g.answer; markBits(node, "b", g.answer); }
+  if (g.input === "fp") { const a = fpEncode(g.value); ok = readBits(node, "s") === a.sign && readBits(node, "m") === a.mantissa && readBits(node, "e") === a.exponent; markBits(node, "s", a.sign); markBits(node, "m", a.mantissa); markBits(node, "e", a.exponent); }
+  const fb = node.querySelector(".feedback");
+  if (ok && !st.solved) { st.solved = true; st.done++; st.streak = st.att === 0 ? st.streak + 1 : 0; fb.textContent = "Correct. Press New question for another."; node.classList.add("is-correct"); }
+  else if (!ok) { st.att++; fb.textContent = "Not yet. Red bits or values are wrong; try again."; if (st.att >= 2) node.querySelector(".gen-show").hidden = false; }
+  updateStreak(node);
+}
+function showGen(node) {
+  const st = genState[node.dataset.id]; const g = st.cur;
+  if (g.input === "num" || g.input === "text") node.querySelector(".gen-body input").value = g.answer;
+  if (g.input === "bits") fillBits(node, "b", g.answer);
+  if (g.input === "fp") { const a = fpEncode(g.value); fillBits(node, "s", a.sign); fillBits(node, "m", a.mantissa); fillBits(node, "e", a.exponent); }
+  st.streak = 0; st.solved = true; updateStreak(node);
+  node.querySelector(".feedback").textContent = "Answer shown. Press New question and try another.";
+}
+
+// ---------- Python in a background worker ----------
+const PY_INDEX = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+const HARNESS = "def __run(src, inputs, check, files):\n    import io, contextlib, traceback\n    for name in files:\n        with open(name, \"w\") as handle:\n            handle.write(files[name])\n    queue = list(inputs)\n    buf = io.StringIO()\n\n    def fake_input(prompt=\"\"):\n        buf.write(str(prompt))\n        if not queue:\n            raise EOFError(\"the program asked for more keyboard input than was given\")\n        value = queue.pop(0)\n        buf.write(value + \"\\n\")\n        return value\n\n    def set_inputs(values):\n        queue[:] = list(values)\n\n    def inputs_left():\n        return len(queue)\n\n    def where(err):\n        line = None\n        for frame in traceback.extract_tb(err.__traceback__):\n            if frame.filename == \"your_program.py\":\n                line = frame.lineno\n        return line\n\n    ns = {\"__name__\": \"__main__\", \"input\": fake_input}\n    status, message = \"ok\", \"\"\n    try:\n        code = compile(src, \"your_program.py\", \"exec\")\n        with contextlib.redirect_stdout(buf):\n            exec(code, ns)\n    except SyntaxError as err:\n        status, message = \"syntax\", \"Syntax error on line \" + str(err.lineno) + \": \" + str(err.msg)\n    except BaseException as err:\n        line = where(err)\n        status = \"execution\"\n        message = \"Execution error\" + (\" on line \" + str(line) if line else \"\") + \": \" + type(err).__name__ + \": \" + str(err)\n    output = buf.getvalue()\n    if status == \"ok\" and check:\n        env = {\"ns\": ns, \"output\": output, \"source\": src, \"set_inputs\": set_inputs, \"inputs_left\": inputs_left}\n        quiet = io.StringIO()\n        try:\n            with contextlib.redirect_stdout(quiet):\n                exec(check, env)\n        except AssertionError as err:\n            status, message = \"fail\", str(err)\n        except BaseException as err:\n            line = where(err)\n            status = \"execution\"\n            message = \"Your code raised \" + type(err).__name__ + \": \" + str(err) + (\" (line \" + str(line) + \")\" if line else \"\")\n    return {\"status\": status, \"output\": output, \"message\": message}\n";
+let pyWorker = null, pyReady = null, pyReq = 0;
+const pyPending = {};
+function startPython() {
+  const src = `importScripts(${JSON.stringify(PY_INDEX + "pyodide.js")});
+let py;
+const ready = loadPyodide({ indexURL: ${JSON.stringify(PY_INDEX)} }).then((p) => { py = p; py.runPython(${JSON.stringify(HARNESS)}); postMessage({ type: "ready" }); }).catch((e) => postMessage({ type: "loadfail", error: String(e) }));
+onmessage = async (e) => {
+  const d = e.data;
+  try {
+    await ready;
+    py.globals.set("__args", py.toPy(d));
+    const r = py.runPython("__run(__args['src'], __args['inputs'], __args['check'], __args['files'])");
+    const out = r.toJs({ dict_converter: Object.fromEntries });
+    r.destroy();
+    postMessage(Object.assign({ type: "result", id: d.id }, out));
+  } catch (err) {
+    postMessage({ type: "result", id: d.id, status: "execution", output: "", message: String(err) });
+  }
+};`;
+  pyWorker = new Worker(URL.createObjectURL(new Blob([src], { type: "text/javascript" })));
+  pyReady = new Promise((resolve, reject) => {
+    pyWorker.onmessage = (e) => {
+      const m = e.data;
+      if (m.type === "ready") resolve();
+      else if (m.type === "loadfail") reject(new Error(m.error));
+      else if (m.type === "result" && pyPending[m.id]) { clearTimeout(pyPending[m.id].timer); pyPending[m.id].resolve(m); delete pyPending[m.id]; }
+    };
+    pyWorker.onerror = (e) => reject(e);
+  });
+  pyReady.catch(() => { if (pyWorker) pyWorker.terminate(); pyWorker = null; });
+}
+async function runPython(src, inputs, check, files) {
+  if (!pyWorker) startPython();
+  await pyReady;
+  return new Promise((resolve) => {
+    const id = ++pyReq;
+    const timer = setTimeout(() => {
+      if (pyWorker) pyWorker.terminate();
+      pyWorker = null;
+      delete pyPending[id];
+      resolve({ status: "timeout", output: "", message: "Your program ran for more than 5 seconds, so it was stopped. Look for a loop that never ends." });
+    }, 5000);
+    pyPending[id] = { resolve, timer };
+    pyWorker.postMessage({ id, src, inputs, check, files });
+  });
+}
+
+const HIGHER_RULES = [
+  [/\bbreak\b/, "<span class='mono'>break</span> isn't in the Higher course: use a conditional loop that stops when its condition is met."],
+  [/\btry\s*:/, "<span class='mono'>try</span>/<span class='mono'>except</span> isn't in the Higher course: validate input with a conditional loop instead."],
+  [/\b(max|min|sum)\s*\(/, "Built-in <span class='mono'>max()</span>, <span class='mono'>min()</span> and <span class='mono'>sum()</span> do the standard algorithms for you: in the exam you must write the loop yourself."],
+  [/\.sort\s*\(|\bsorted\s*\(/, "Sorting isn't in the Higher course."],
+  [/\.index\s*\(|\.count\s*\(/, "<span class='mono'>.index()</span> and <span class='mono'>.count()</span> replace the linear search and count occurrences algorithms: write the loop yourself."],
+  [/\[[^\]\n]*\bfor\b[^\]\n]*\bin\b[^\]\n]*\]/, "List comprehensions aren't in the Higher course: build the array with a fixed loop."],
+];
+function higherNote(node, src) {
+  const notes = HIGHER_RULES.filter(([re]) => re.test(src.replace(/#.*$/gm, ""))).map(([, msg]) => `<li>${msg}</li>`);
+  const box = node.querySelector(".higher-note");
+  box.hidden = !notes.length;
+  box.innerHTML = notes.length ? `<b>Higher check</b><ul>${notes.join("")}</ul>` : "";
+}
+function showConsole(node, text, isError) {
+  const c = node.querySelector(".console");
+  c.hidden = false;
+  c.classList.toggle("err", !!isError);
+  c.textContent = text || "(no output)";
+}
+async function codeRun(b, node, mode) {
+  const src = node.querySelector(".editor").value;
+  const fb = node.querySelector(".feedback");
+  const btns = node.querySelectorAll(".run-btn, .code-check");
+  btns.forEach((x) => (x.disabled = true));
+  higherNote(node, src);
+  fb.textContent = pyWorker ? (mode === "run" ? "Running…" : "Testing…") : "Loading Python. The first time takes about 10 seconds…";
+  try {
+    if (mode === "run") {
+      const inputs = node.querySelector(".stdin").value.split("\n").filter((l, i, a) => l !== "" || i < a.length - 1);
+      const r = await runPython(src, inputs, "", b.files || {});
+      showConsole(node, r.output + (r.message ? (r.output ? "\n" : "") + r.message : ""), r.status !== "ok");
+      fb.textContent = r.status === "ok" ? "Program finished. Press Check to test it." : r.status === "timeout" ? r.message : "Your program stopped with an error: read the last line of the output.";
+    } else {
+      const t = T(b.id);
+      t.v = src; t.att++;
+      let failed = null, last = null;
+      for (const c of b.cases) {
+        const r = await runPython(src, c.inputs || [], c.check, c.files || b.files || {});
+        last = r;
+        if (r.status !== "ok") { failed = r; break; }
+      }
+      if (!failed) {
+        if (t.s !== "shown") t.s = "correct";
+        node.classList.add("is-correct"); node.classList.remove("is-shown");
+        fb.textContent = `All tests passed.`;
+        node.querySelector(".model-btn").hidden = true;
+        showConsole(node, last.output, false);
+      } else {
+        fb.textContent = failed.status === "fail" ? "Not yet: " + failed.message : failed.status === "timeout" ? failed.message : "Not yet: your program stopped with an error.";
+        showConsole(node, failed.output + (failed.status !== "fail" && failed.message ? (failed.output ? "\n" : "") + failed.message : ""), failed.status !== "fail");
+        if (t.att >= 2) node.querySelector(".model-btn").hidden = false;
+      }
+      save();
+    }
+  } catch (err) {
+    fb.textContent = "Python couldn't load. Check your internet connection, then press Run or Check again.";
+  }
+  btns.forEach((x) => (x.disabled = false));
+}
+
+// ---------- web tasks: live preview in a frame ----------
+function placeholderImage(name) {
+  let hue = 0;
+  for (const ch of name) hue = (hue * 31 + ch.charCodeAt(0)) % 360;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300"><rect width="600" height="300" fill="hsl(${hue},45%,55%)"/><text x="300" y="160" font-family="sans-serif" font-size="34" fill="white" text-anchor="middle">${name}</text></svg>`;
+  return "data:image/svg+xml;base64," + btoa(svg);
+}
+const webHelpers = { img: placeholderImage };
+function withImages(html) {
+  return html.replace(/(["'])(?:images|media)\/([\w-]+)\.(?:jpe?g|png|gif)\1/g, (m, q, name) => q + placeholderImage(name) + q);
+}
+function renderPreview(node, html) {
+  const frame = node.querySelector(".preview");
+  return new Promise((resolve) => {
+    frame.onload = () => setTimeout(resolve, 60);
+    const guard = `<script>document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a");if(a){e.preventDefault();}},true);document.addEventListener("submit",function(e){e.preventDefault();},true);<\/script>`;
+    let page = withImages(html);
+    page = /<head[^>]*>/i.test(page) ? page.replace(/<head[^>]*>/i, (m) => m + guard) : guard + page;
+    frame.srcdoc = page;
+  });
+}
+async function webCheck(b, node) {
+  const src = node.querySelector(".editor").value;
+  const fb = node.querySelector(".feedback");
+  const t = T(b.id);
+  t.v = src; t.att++;
+  await renderPreview(node, src);
+  const frame = node.querySelector(".preview");
+  let problem = null;
+  try {
+    const doc = frame.contentDocument, win = frame.contentWindow;
+    for (const check of b.checks) { problem = check(doc, win, webHelpers); if (problem) break; }
+  } catch (err) { problem = "Your page caused an error while it was being checked: " + err.message; }
+  if (!problem) {
+    if (t.s !== "shown") t.s = "correct";
+    node.classList.add("is-correct"); node.classList.remove("is-shown");
+    fb.textContent = "All checks passed.";
+    node.querySelector(".model-btn").hidden = true;
+  } else {
+    fb.textContent = "Not yet: " + problem;
+    if (t.att >= 2) node.querySelector(".model-btn").hidden = false;
+    renderPreview(node, src);
+  }
+  save();
+}
+
+// ---------- SQL tasks: an in-page SQLite database ----------
+const SQL_BASE = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/";
+let sqlReady = null;
+function loadSql() {
+  if (sqlReady) return sqlReady;
+  sqlReady = new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = SQL_BASE + "sql-wasm.js";
+    s.onload = () => window.initSqlJs({ locateFile: (f) => SQL_BASE + f }).then(resolve, reject);
+    s.onerror = () => reject(new Error("sql.js failed to load"));
+    document.head.appendChild(s);
+  });
+  sqlReady.catch(() => { sqlReady = null; });
+  return sqlReady;
+}
+function sqlLiteral(v) {
+  if (v === null) return "NULL";
+  if (typeof v === "number") return String(v);
+  if (typeof v === "boolean") return v ? "1" : "0";
+  return "'" + String(v).replace(/'/g, "''") + "'";
+}
+function freshDb(SQL) {
+  const db = new SQL.Database();
+  db.exec(DB.schema);
+  for (const [name, tb] of Object.entries(DB.tables)) {
+    for (const r of tb.rows) db.exec(`INSERT INTO ${name} (${tb.cols.join(", ")}) VALUES (${r.map(sqlLiteral).join(", ")});`);
+  }
+  return db;
+}
+function runSql(SQL, sql) {
+  const db = freshDb(SQL);
+  try {
+    const res = db.exec(sql);
+    const changed = db.getRowsModified();
+    return { ok: true, res, changed, db };
+  } catch (err) {
+    return { ok: false, error: err.message, db };
+  }
+}
+function tableHtml(r) {
+  if (!r) return "";
+  const body = r.values.slice(0, 200).map((row) => `<tr>${row.map((v) => `<td>${esc(v === null ? "NULL" : typeof v === "number" && !Number.isInteger(v) ? Math.round(v * 100) / 100 : v)}</td>`).join("")}</tr>`).join("");
+  return `<div class="trace-wrap"><table class="tbl result"><tr>${r.columns.map((c) => `<th>${esc(c)}</th>`).join("")}</tr>${body}</table></div><p class="small">${r.values.length} row${r.values.length === 1 ? "" : "s"}</p>`;
+}
+const normVal = (v) => (v === null ? "NULL" : typeof v === "number" ? String(Math.round(v * 100) / 100) : String(v).trim());
+function sameResult(a, b, ordered, names) {
+  if (!a || !b) return a === b ? null : "Your query returned no results table.";
+  if (a.columns.length !== b.columns.length) return `Your results have ${a.columns.length} column${a.columns.length === 1 ? "" : "s"}; the answer has ${b.columns.length}. Check which fields you SELECT.`;
+  if (names) for (let i = 0; i < b.columns.length; i++) if (a.columns[i].toLowerCase() !== b.columns[i].toLowerCase()) return `Column ${i + 1} should be called ${b.columns[i]}. Use AS to give it that name.`;
+  if (a.values.length !== b.values.length) return `Your query returned ${a.values.length} row${a.values.length === 1 ? "" : "s"}; the answer has ${b.values.length}. Check your WHERE conditions${ordered ? "" : " and GROUP BY"}.`;
+  const ra = a.values.map((r) => r.map(normVal).join("\u0001")), rb = b.values.map((r) => r.map(normVal).join("\u0001"));
+  if (ordered) { for (let i = 0; i < ra.length; i++) if (ra[i] !== rb[i]) return `Row ${i + 1} doesn't match. Check your ORDER BY${i === 0 ? " and the values you calculate" : ""}.`; return null; }
+  const sa = ra.slice().sort(), sb = rb.slice().sort();
+  for (let i = 0; i < sa.length; i++) if (sa[i] !== sb[i]) return "Your rows contain different values from the answer. Check your conditions and any calculations.";
+  return null;
+}
+async function sqlTask(b, node, mode) {
+  const src = node.querySelector(".editor").value;
+  const fb = node.querySelector(".feedback");
+  const out = node.querySelector(".sql-out");
+  fb.textContent = sqlReady ? "" : "Loading the database…";
+  let SQL;
+  try { SQL = await loadSql(); } catch (e) { fb.textContent = "The database couldn't load. Check your internet connection and try again."; return; }
+  const mine = runSql(SQL, src);
+  if (!mine.ok) { out.innerHTML = `<pre class="console err">${esc(mine.error)}</pre>`; fb.textContent = "Your SQL has an error: read the message above."; }
+  if (mode === "run") {
+    if (mine.ok) {
+      out.innerHTML = mine.res.length ? tableHtml(mine.res[mine.res.length - 1]) : `<p class="small">Statement ran. ${mine.changed} row${mine.changed === 1 ? "" : "s"} changed.</p>`;
+      if (b.verify && !mine.res.length) { const v = mine.db.exec(b.verify); out.innerHTML += `<p class="small">The table afterwards:</p>` + tableHtml(v[0]); }
+      fb.textContent = "Query ran. Press Check to test it.";
+    }
+    mine.db.close();
+    return;
+  }
+  const t = T(b.id);
+  t.v = src; t.att++;
+  let problem = null;
+  if (!mine.ok) problem = "Your SQL has an error.";
+  else {
+    const model = runSql(SQL, b.model);
+    if (b.verify) {
+      const mv = mine.db.exec(b.verify)[0], wv = model.db.exec(b.verify)[0];
+      problem = sameResult(mv, wv, true, false);
+      if (problem) problem = "The table isn't changed in the right way. Check your WHERE condition and the values you set.";
+      out.innerHTML = `<p class="small">The table after your statement:</p>` + tableHtml(mv);
+    } else {
+      const mr = mine.res[mine.res.length - 1], wr = model.res[model.res.length - 1];
+      out.innerHTML = tableHtml(mr);
+      problem = sameResult(mr, wr, !!b.ordered, !!b.names);
+      if (!problem && b.mustUse) for (const [re, msg] of b.mustUse) if (!re.test(src)) { problem = msg; break; }
+    }
+    model.db.close();
+  }
+  mine.db.close();
+  if (!problem) {
+    if (t.s !== "shown") t.s = "correct";
+    node.classList.add("is-correct"); node.classList.remove("is-shown");
+    fb.textContent = "Correct: your results match.";
+    node.querySelector(".model-btn").hidden = true;
+  } else {
+    fb.textContent = "Not yet: " + problem;
+    if (t.att >= 2) node.querySelector(".model-btn").hidden = false;
+  }
+  save();
+}
+
+// ---------- views ----------
+const $main = () => document.getElementById("main");
+function labelFor(b, prefix, counter) { return `${prefix} ${counter}`; }
+
+function renderChapter(ch) {
+  let n = 0;
+  const lab = () => `Try it ${ch.num}.${++n}`;
+  const p = progress(ch);
+  const rag = S.rag[ch.id] || [];
+  const idx = CHAPTERS.indexOf(ch);
+  let h = `<header class="ch-head"><p class="eyebrow">Chapter ${ch.num}</p><h2>${ch.title}</h2>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${p.total}" aria-valuenow="${p.done}"><span style="width:${(100 * p.done) / p.total}%"></span></div><p class="small">${p.done} of ${p.total} tasks done</p></header>
+    <div class="intentions"><h3>Learning intentions</h3><ul>${ch.intentions.map((i) => `<li>${i}</li>`).join("")}</ul></div>`;
+  if (ch.recall.length) {
+    h += `<div class="recall"><h3>Quick recall</h3><p class="small">Questions from earlier chapters, to keep them fresh.</p>`;
+    ch.recall.forEach((b, i) => { h += R[b.type](b, `Recall ${i + 1}`); });
+    h += `</div>`;
+  }
+  ch.blocks.forEach((b) => { h += R[b.type](b, ["text", "figure", "gen", "dbview"].includes(b.type) ? "" : lab()); });
+  h += `<div class="exam"><h3>Exam practice</h3><p class="small">Write a full answer, then mark it against the marking points.</p>`;
+  ch.exam.forEach((b, i) => { h += R[b.type](b, `Exam ${ch.num}.${i + 1}`); });
+  h += `</div><div class="rag"><h3>How confident are you?</h3>${ch.intentions.map((it, i) => `<div class="rag-row"><span>${it}</span><div class="rag-btns" role="group" aria-label="${esc(it)}">${["Not yet", "Getting there", "Confident"].map((l, j) => `<button type="button" class="rag-btn r${j} ${rag[i] === j ? "on" : ""}" data-i="${i}" data-j="${j}">${l}</button>`).join("")}</div></div>`).join("")}</div>
+    <nav class="pager">${idx > 0 ? `<a href="#${CHAPTERS[idx - 1].id}">← ${CHAPTERS[idx - 1].title}</a>` : `<a href="#home">← Overview</a>`}${idx < CHAPTERS.length - 1 ? `<a href="#${CHAPTERS[idx + 1].id}">${CHAPTERS[idx + 1].title} →</a>` : `<a href="#home">Overview →</a>`}</nav>`;
+  $main().innerHTML = h;
+  $main().querySelectorAll(".task.gen").forEach(newGen);
+  $main().querySelectorAll(".web-task").forEach((n) => renderPreview(n, n.querySelector(".editor").value));
+  bindChapter(ch);
+}
+
+function renderHome() {
+  const all = CHAPTERS.map(progress);
+  const done = all.reduce((a, p) => a + p.done, 0), total = all.reduce((a, p) => a + p.total, 0);
+  const next = CHAPTERS.find((c) => { const p = progress(c); return p.done < p.total; }) || CHAPTERS[0];
+  $main().innerHTML = `<header class="hero"><p class="eyebrow">Higher Computing Science</p><h2>${BOOK.short} workbook</h2>
+    <p class="lede">Learn a little, try it straight away, get instant feedback. Every chapter starts with quick recall from earlier chapters and ends with exam practice and a confidence check.</p>
+    <div class="hero-stats"><div><b>${done}</b><span>of ${total} tasks done</span></div><a class="primary big" href="#${next.id}">${done ? "Continue" : "Start"}: ${next.title}</a></div></header>
+    <div class="cards">${CHAPTERS.map((c, i) => { const p = all[i]; const rag = S.rag[c.id] || []; const conf = rag.filter((x) => x === 2).length; return `<a class="card ${p.done === p.total ? "complete" : ""}" href="#${c.id}"><span class="num">${c.num}</span><span class="ct">${c.title}</span><span class="bar"><span style="width:${(100 * p.done) / p.total}%"></span></span><span class="small">${p.done}/${p.total} tasks${conf ? ` · ${conf}/${c.intentions.length} confident` : ""}</span></a>`; }).join("")}</div>
+    <div class="howto"><h3>How it works</h3><ul><li><b>Try it</b> tasks check your answer instantly. After two tries you can see the answer.</li>${BOOK.howto.map((h) => `<li>${h}</li>`).join("")}<li><b>Practice machines</b> make a new question every time, so you can practise as much as you like.</li><li><b>Exam practice</b>: write your answer, then tick the marking points it makes.</li></ul>
+    <h3>Keeping your progress</h3><p>This browser remembers your work, but only on this device, and a shared school computer may forget it when you log off. At the end of each lesson, <b>download your progress file</b> and keep it in your OneDrive or Google Drive. Next time, on any device, <b>load</b> it to carry on where you left off.</p>
+    <div class="save-row"><button type="button" class="primary home-save">Download my progress</button><button type="button" class="ghost home-load">Load my progress</button></div>
+    <p class="small">${S.savedAt ? `Last downloaded: ${new Date(S.savedAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}.` : "You haven't downloaded a progress file yet."} <button type="button" class="link reset-btn">Reset my progress</button></p><div class="confirm" hidden><p>Clear every answer and start again?</p><button type="button" class="primary danger yes-reset">Yes, clear it</button><button type="button" class="ghost no-reset">Keep my progress</button></div></div>`;
+  $main().querySelector(".home-save").onclick = () => document.getElementById("save-btn").click();
+  $main().querySelector(".home-load").onclick = () => document.getElementById("load-file").click();
+  $main().querySelector(".reset-btn").onclick = () => { $main().querySelector(".confirm").hidden = false; };
+  $main().querySelector(".no-reset").onclick = () => { $main().querySelector(".confirm").hidden = true; };
+  $main().querySelector(".yes-reset").onclick = () => { S = { tasks: {}, rag: {} }; save(); route(); };
+}
+
+function renderNav(active) {
+  document.getElementById("nav").innerHTML = `<a href="#home" class="${active === "home" ? "on" : ""}"><span class="num">·</span>Overview</a>` + CHAPTERS.map((c) => { const p = progress(c); return `<a href="#${c.id}" class="${active === c.id ? "on" : ""} ${p.done === p.total ? "complete" : ""}"><span class="num">${c.num}</span><span class="nt">${c.title}</span><span class="mini">${p.done}/${p.total}</span></a>`; }).join("");
+}
+
+function refreshProgress(ch) {
+  const p = progress(ch);
+  const head = $main().querySelector(".ch-head");
+  if (head) { head.querySelector(".bar span").style.width = (100 * p.done) / p.total + "%"; head.querySelector(".small").textContent = `${p.done} of ${p.total} tasks done`; }
+  renderNav(ch.id);
+}
+
+function bindChapter(ch) {
+  const all = [...ch.recall, ...ch.blocks, ...ch.exam];
+  const byId = Object.fromEntries(all.filter((b) => b.id).map((b) => [b.id, b]));
+  const m = $main();
+  m.onclick = (e) => {
+    const bit = e.target.closest(".bit");
+    if (bit) { bit.textContent = bit.textContent === "1" ? "0" : "1"; bit.classList.remove("wrong"); return; }
+    const gnode = e.target.closest(".task.gen");
+    if (gnode) {
+      if (e.target.closest(".gen-new")) newGen(gnode);
+      else if (e.target.closest(".gen-check")) checkGen(gnode);
+      else if (e.target.closest(".gen-show")) showGen(gnode);
+      return;
+    }
+    const rb = e.target.closest(".rag-btn");
+    if (rb) { const r = (S.rag[ch.id] = S.rag[ch.id] || []); r[Number(rb.dataset.i)] = Number(rb.dataset.j); save(); rb.parentNode.querySelectorAll(".rag-btn").forEach((x) => x.classList.toggle("on", x === rb)); return; }
+    const node = e.target.closest(".task[data-id]");
+    if (!node) return;
+    const b = byId[node.dataset.id];
+    const t = T(b.id);
+    const fb = node.querySelector(".feedback");
+    if (b.type === "code" || b.type === "web" || b.type === "sql") {
+      const run = b.type === "code" ? (m) => codeRun(b, node, m) : b.type === "sql" ? (m) => sqlTask(b, node, m) : (m) => (m === "run" ? renderPreview(node, node.querySelector(".editor").value) : webCheck(b, node));
+      if (e.target.closest(".run-btn")) run("run");
+      else if (e.target.closest(".code-check")) Promise.resolve(run("check")).then(() => refreshProgress(ch));
+      else if (e.target.closest(".reset-code")) { node.querySelector(".editor").value = b.starter || ""; t.v = b.starter || ""; save(); if (b.type === "web") renderPreview(node, t.v); }
+      else if (e.target.closest(".model-btn")) { node.querySelector(".model").hidden = false; if (t.s !== "correct") { t.s = "shown"; node.classList.add("is-shown"); } save(); refreshProgress(ch); }
+      return;
+    }
+    if (e.target.closest(".hint-btn")) { const hn = node.querySelector(".hint"); hn.hidden = !hn.hidden; return; }
+    if (e.target.closest(".show-btn")) { revealAnswer(b, node); if (t.s !== "correct") t.s = "shown"; node.className = "task is-shown"; fb.textContent = "Answer shown. Try the next one on your own."; save(); refreshProgress(ch); return; }
+    if (e.target.closest(".mark-btn")) {
+      const pts = node.querySelector(".points");
+      t.v = node.querySelector("textarea").value;
+      if (pts.hidden) { pts.hidden = false; t.s = "marked"; t.ticks = t.ticks || []; node.classList.add("is-marked"); e.target.textContent = "Hide marking points"; pts.querySelector(".score").textContent = `You gave yourself ${t.ticks.length} of ${b.marks}.`; }
+      else { pts.hidden = true; e.target.textContent = "Mark my answer"; }
+      save(); refreshProgress(ch); return;
+    }
+    const opt = e.target.closest(".opt");
+    if (opt && b.type === "multi") { opt.classList.toggle("picked"); opt.setAttribute("aria-pressed", opt.classList.contains("picked")); return; }
+    if (opt && b.type === "choice") {
+      node.querySelectorAll(".opt").forEach((x) => x.classList.toggle("picked", x === opt));
+      t.v = Number(opt.dataset.i); t.att++;
+      if (t.v === b.correct) { t.s = t.s === "shown" ? "shown" : "correct"; node.className = "task is-correct"; fb.textContent = "Correct."; }
+      else { fb.textContent = "Not yet. Try another option."; if (t.att >= 2) node.querySelector(".show-btn").hidden = false; }
+      save(); refreshProgress(ch); return;
+    }
+    if (e.target.closest(".check-btn")) {
+      const r = evaluate(b, node);
+      t.v = r.v; t.att++;
+      if (r.ok) { if (t.s !== "shown") t.s = "correct"; node.className = "task is-correct"; fb.textContent = "Correct."; node.querySelector(".show-btn").hidden = true; }
+      else { fb.textContent = b.type === "bits" || b.type === "fp" ? "Not yet. The red bits are wrong; try again." : "Not yet. Check the highlighted answers and try again."; if (t.att >= 2) node.querySelector(".show-btn").hidden = false; }
+      save(); refreshProgress(ch);
+    }
+  };
+  m.onchange = (e) => {
+    const cb = e.target.closest(".point input");
+    if (!cb) return;
+    const node = e.target.closest(".task[data-id]"); const b = byId[node.dataset.id]; const t = T(b.id);
+    t.ticks = [...node.querySelectorAll(".point input")].map((x, i) => (x.checked ? i : -1)).filter((i) => i >= 0);
+    node.querySelector(".score").textContent = `You gave yourself ${t.ticks.length} of ${b.marks}.`;
+    save();
+  };
+  m.oninput = (e) => {
+    const ta = e.target.closest("textarea");
+    if (!ta) return;
+    const t = T(ta.closest(".task").dataset.id);
+    if (ta.classList.contains("stdin")) t.stdin = ta.value; else t.v = ta.value;
+    save();
+  };
+  m.onkeydown = (e) => {
+    const ed = e.target.closest("textarea.editor");
+    if (ed && e.key === "Escape") { ed.dataset.leave = "1"; return; }
+    if (ed && e.key === "Tab" && ed.dataset.leave === "1") { delete ed.dataset.leave; return; }
+    if (ed && (e.key === "Tab" || e.key === "Enter") && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      delete ed.dataset.leave;
+      const { selectionStart: a, selectionEnd: z, value } = ed;
+      let insert;
+      if (e.key === "Tab") {
+        if (e.shiftKey) return;
+        insert = "    ";
+      } else {
+        const lineStart = value.lastIndexOf("\n", a - 1) + 1;
+        const line = value.slice(lineStart, a);
+        const indent = line.match(/^ */)[0];
+        insert = "\n" + indent + (/:\s*$/.test(line) ? "    " : "");
+      }
+      e.preventDefault();
+      ed.value = value.slice(0, a) + insert + value.slice(z);
+      ed.selectionStart = ed.selectionEnd = a + insert.length;
+      ed.dispatchEvent(new Event("input", { bubbles: true }));
+      return;
+    }
+    if (e.key === "Enter" && e.target.matches("input[type=text]")) { const n = e.target.closest(".task"); const btn = n && (n.querySelector(".check-btn") || n.querySelector(".gen-check")); if (btn) btn.click(); }
+  };
+}
+
+// ---------- progress file ----------
+const FILE_TAG = BOOK.tag;
+function countDone(state) {
+  return CHAPTERS.reduce((a, ch) => a + countable(ch).filter((b) => { const t = state.tasks[b.id]; return t && ["correct", "shown", "marked"].includes(t.s); }).length, 0);
+}
+const totalTasks = () => CHAPTERS.reduce((a, ch) => a + countable(ch).length, 0);
+function setStatus(msg) { document.getElementById("save-status").textContent = msg; }
+
+// Inside Claude, downloads go through the platform; on a self-hosted page, through an ordinary link.
+let claudeDownloads = null;
+try {
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("downloads").then((d) => { claudeDownloads = d; }).catch(() => { claudeDownloads = null; });
+  }
+} catch (e) { claudeDownloads = null; }
+
+document.getElementById("save-btn").onclick = async () => {
+  const savedAt = new Date().toISOString();
+  const data = JSON.stringify({ app: FILE_TAG, version: 1, savedAt, progress: Object.assign({}, S, { savedAt }) }, null, 1);
+  const filename = `${BOOK.file}-progress-${savedAt.slice(0, 10)}.json`;
+  const done = () => { S.savedAt = savedAt; save(); setStatus(`Saved ${countDone(S)} of ${totalTasks()} tasks to ${filename}. Keep it in your OneDrive or Google Drive.`); if (!location.hash || location.hash === "#home") route(); };
+  if (claudeDownloads) {
+    try { await claudeDownloads.save({ filename, data }); done(); }
+    catch (err) {
+      const code = err && err.code;
+      if (code === "declined") setStatus("Download cancelled. Nothing was saved.");
+      else if (code === "rate_limited") setStatus("A save is already waiting for you to confirm. Try again in a moment.");
+      else setStatus("Downloads aren't available in this view. Open the workbook from your school's link to save a file.");
+    }
+    return;
+  }
+  try {
+    const url = URL.createObjectURL(new Blob([data], { type: "application/json" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    done();
+  } catch (e) {
+    setStatus("This browser blocked the download. Try another browser, or ask your teacher.");
+  }
+};
+
+let pending = null;
+document.getElementById("load-file").onchange = (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const d = JSON.parse(reader.result);
+      if (d.app !== FILE_TAG || !d.progress || typeof d.progress.tasks !== "object") throw new Error("not ours");
+      pending = { tasks: d.progress.tasks || {}, rag: d.progress.rag || {}, savedAt: d.progress.savedAt };
+      const when = d.savedAt ? new Date(d.savedAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : "an unknown date";
+      document.getElementById("load-summary").textContent = `This file was saved on ${when} and has ${countDone(pending)} of ${totalTasks()} tasks done. You have ${countDone(S)} done here.`;
+      document.getElementById("load-confirm").hidden = false;
+      setStatus("");
+    } catch (err) {
+      setStatus(`That file isn't a ${BOOK.short} progress file. Choose the .json file you downloaded from this workbook.`);
+    }
+  };
+  reader.onerror = () => setStatus("The file couldn't be read. Try choosing it again.");
+  reader.readAsText(file);
+};
+document.getElementById("load-yes").onclick = () => {
+  if (!pending) return;
+  S = pending; pending = null; save();
+  document.getElementById("load-confirm").hidden = true;
+  setStatus(`Progress loaded: ${countDone(S)} of ${totalTasks()} tasks done.`);
+  route();
+};
+document.getElementById("load-no").onclick = () => { pending = null; document.getElementById("load-confirm").hidden = true; setStatus("Nothing changed."); };
+
+function route() {
+  const id = location.hash.replace("#", "");
+  const ch = CHAPTERS.find((c) => c.id === id);
+  renderNav(ch ? ch.id : "home");
+  if (ch) renderChapter(ch); else renderHome();
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+route();
+
+</script>
+</body>
+</html>
